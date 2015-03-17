@@ -1,4 +1,4 @@
-package pl.tk.warszawscala.slickday.web.model
+package pl.tk.warszawscala.slickday.web.http.model
 
 import java.time.{ZoneOffset, LocalDateTime}
 
@@ -7,7 +7,7 @@ import DefaultJsonProtocol._
 /**
  * Created by tomaszk on 3/12/15.
  */
-object JsonProtocol extends DefaultJsonProtocol {
+object MyJsonProtocol extends DefaultJsonProtocol {
 
 
   implicit object LocalDateTimeFormat extends RootJsonFormat[LocalDateTime] {

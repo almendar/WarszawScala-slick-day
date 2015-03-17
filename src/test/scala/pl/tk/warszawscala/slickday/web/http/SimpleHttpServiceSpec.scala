@@ -2,13 +2,13 @@ package pl.tk.warszawscala.slickday.web.http
 
 import org.specs2.mutable.Specification
 import pl.tk.evojam.web.persistence.InvitationsDatabase
-import pl.tk.warszawscala.slickday.web.model.{JsonProtocol, Note}
+import pl.tk.warszawscala.slickday.web.http.model.{MyJsonProtocol, Note}
 import pl.tk.warszawscala.slickday.web.persistence.{NotesDatabase, Database, DataBaseProvider}
 import spray.testkit.Specs2RouteTest
 import spray.http._
 import spray.http.StatusCodes
 import spray.httpx.SprayJsonSupport._
-import JsonProtocol._
+import MyJsonProtocol._
 
 /**
  * Created by tomaszk on 3/12/15.
