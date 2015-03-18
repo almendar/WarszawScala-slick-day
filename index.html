@@ -4,10 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>reveal.js - The HTML Presentation Framework</title>
-
-		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-		<meta name="author" content="Hakim El Hattab">
+		<title>Slick - Warsaw Scala Enthusiasts Meetup</title>
 
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -39,9 +36,183 @@
 		<div class="reveal">
 
 			<div class="slides">
-				<section>
-					TODO
+				<section data-markdown>
+					## Slick
+					#### (How to wrap your head around it if you're an ORM junkie)
+					##### Warsaw Scala Enthusiasts Meetup
+					By Tomasz Kogut / [@almendar](http://twitter.com/almendar)
+					2015.04.01
 				</section>
+				<section>
+					<h3>Before we dive into slick, let's talk what is wrong with ORM's?</h3>
+					<p class="fragment">Object-relational impedance mismatch<br/>(<a href="http://blogs.tedneward.com/2006/06/26/The+Vietnam+Of+Computer+Science.aspx">The Vietnam of Computer Science</a>)</p>
+					<ul>
+						<li class="fragment">Leaky abstraction - you can feel it those are not objects</li>
+						<li class="fragment">Very easy to start, very hard to bend it to all needs</li>
+						<li class="fragment">Complex, complicated, sometimes performance killer</li>
+						<li class="fragment">
+							Often used incorrectly:
+							<ul>
+								<li>Getting the whole object-graph from database</li>
+								<li>Referring to objects not fully fetched, ouside of the persistence context</li>
+							</ul>
+						</li>
+					</ul>		
+				</section>
+				<section>
+					<h2>What's so special about slick?</h2>
+					<ul>
+						<li class="fragment">A Functional Relational Mapper for Scala</li>
+						<li class="fragment">Does not try to mimic DB relations as objects</li>
+						<li class="fragment">Uses tuples</li>
+						<li class="fragment">You already know how to write code in it (collections-like API, for-comprehension FTW!)</li>
+						<li class="fragment">Flexible query composition</li>
+						<li class="fragment">It's very specific when it hits the database so it's easier to track side-effects</li>
+						<li class="fragment">It's type safe</li>
+						<li class="fragment">Embraces SQL and maps it to Scala features</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Hypothetical ORM Question!</h3>	
+					<p>How many databases hits can you see?</p>
+					<pre><code data-trim>
+List&lt;Person&gt; people = PeopleFinder.getByIds(Array.asList(2,9,17,234));
+List&lt;Address&gt; = people.stream()
+  .map(Person::getAddress)
+  .collect(Collectors.toList());
+					</code></pre>
+					<h1 class="fragment">[0..2]</h1>
+				</section>
+				<section>
+					<section>
+						<h3>Slick Question!</h3>
+						<p>How many databases hits can you see?</p>
+						<pre><code data-trim>
+val peopleQuery: Query[People,Person,Seq] = 
+  people.filter(_.id inSet(Set(2,99,17,234)))
+
+val addressesQuery: Query[Addresses,Address,Seq] = 
+  peopleQuery.flatMap(_.address)
+						</code></pre>
+						<h1 class="fragment">0</h1>
+						</section>
+					<section>
+						<h3>Construct your queries lazy until they give you exactly what you need</h3>
+						<pre><code data-trim>
+val addressesAction: DBIO[Seq[Address]] = addressesQuery.result
+val addresses: Future[Seq[Address]] = db.run(addressesAction)
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>How about query languages?</h2>
+						<pre><code data-trim>
+String hql = "UPDATE Employee set salary = :salary "  + 
+             "WHERE id = :employee_id";
+Query query = session.createQuery(hql);
+query.setParameter("salary", 1000);
+query.setParameter("employee_id", 10);
+int result = query.executeUpdate();
+						</code></pre>
+					</section>
+					<section>
+						<h3>What's wrong with this?
+						I event don't even know where to start...</h3>
+						<ul>
+							<li>String concatenation</li>
+							<li>The IDE support</li>
+							<li>Little to none code reuse</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>So maybe some fluent api builders?</h2>
+						<pre><code data-trim>
+						CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
+Root&lt;Pet&gt; pet = cq.from(Pet.class);
+Date someDate = new Date(...);
+cq.where(cb.gt(pet.get(Pet_.birthday), date));
+</code></pre>
+				<p class="fragment">Ain't so bad...</p>
+					</section>
+					<section>
+						<img src="img/orly.jpg" height="300px" />
+						<pre><code data-trim>
+Property age = Property.forName("age");
+List peopleList = sess.createCriteria(Person.class)
+    .add( Restrictions.disjunction()
+        .add( age.eq( new Integer(0) ) )
+        .add( age.eq( new Integer(1) ) )
+        .add( age.eq( new Integer(2) ) )
+        .add( age.eq( new Integer(3) ) )
+    ) )
+    .add( Property.forName("name").in( new String[] { "Fritz", "Izi", "Pk" } ) )
+    .list();
+						</code></pre>
+					</section>
+					<section>
+						<p>Maybe this looks more pleasing:</p>
+						<pre><code data-trim>
+people.filter(p =&gt; (p.age &gt;= 0 || p.age  &lt;= 3) &amp;&amp; 
+  p.name inSet(Set("Fritz", "Izi", "Pk"))) 
+						</code></pre>
+						<div class="fragment">
+						<p>Or this:</p>
+						<pre><code data-trim>
+for {
+  p &lt;- people if (p.age &gt;= 0 || p.age  =&lt; 3) &amp;&amp; 
+    p.name inSet(Set("Fritz", "Izi", "Pk"))
+} yield p
+						</code></pre>
+						<div>
+					</section>
+				</section>
+				<section>
+					<p>Some ORMs will fetch the whole object not only fields that you want</p>
+					<p>Compare that with slick:</p>
+					<pre><code data-trim>people.map(p =&gt; (p.name, p.age))</code></pre>
+				</section>
+				<section>
+					<section>
+						<h2>Relations</h2>
+						<p>How to operate on them in slick?</p>
+					</section>
+					<section>
+					<h3>Sorry, you can't do this</h3>
+						<pre><code data-trim>
+case class Address( … )
+case class Person( …, address: Address )
+						</code></pre>
+						<p>This is why we have ORM problems</p>
+					</section>
+					<section>
+						<h2>Embrace SQL</h2>
+						<pre><code data-trim>
+SELECT * 
+FROM Person 
+JOIN Address ON Person.addressId=Address.id;
+						</code></pre>
+						<pre><code data-trim>
+val tupledJoin: Query[(People,Addresses),(Person,Address), Seq]
+  = people join addresses on (_.addressId === _.id)
+
+case class PersonWithAddress(person: Person, address: Address)
+
+val caseClassJoinResults = db.run(tupledJoin.result)
+  .map(_.map(PersonWithAddress.tupled))
+						</code></pre>
+					</section>
+					<section>
+						<h2>How to modify relations?</h2>
+						<p>It's the same story, you don't update the whole object but only an id like in SQL</p>
+						<p>Bonus is that id is the only thing you need</p>
+					</section>
+
+				</section>
+
 
 			</div>
 
