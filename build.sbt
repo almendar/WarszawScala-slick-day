@@ -26,6 +26,10 @@ libraryDependencies +=  "org.slf4j" % "slf4j-nop" % "1.6.4"
 
 libraryDependencies +=  "com.h2database" % "h2" % "1.3.175"
 
-unmanagedResourceDirectories in Compile <+= (baseDirectory / "static")
+// front end
 
-//excludeFilter in unmanagedResources := HiddenFileFilter || "project*" || "target*" || "src*"
+lazy val root = (project in file(".")).enablePlugins(SbtWeb)
+
+WebKeys.packagePrefix in Assets := "public/"
+
+(managedClasspath in Runtime) += (packageBin in Assets).value
