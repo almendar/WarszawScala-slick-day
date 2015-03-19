@@ -33,3 +33,7 @@ lazy val root = (project in file(".")).enablePlugins(SbtWeb)
 WebKeys.packagePrefix in Assets := "public/"
 
 (managedClasspath in Runtime) += (packageBin in Assets).value
+
+libraryDependencies += "org.webjars" % "angularjs" % "1.3.15"
+
+libraryDependencies += "org.webjars" % "angular-material" % "0.8.3"
