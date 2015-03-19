@@ -23,3 +23,7 @@ libraryDependencies +=  "com.typesafe.slick" %% "slick" % "3.0.0-RC1"
 libraryDependencies +=  "org.slf4j" % "slf4j-nop" % "1.6.4"
 
 libraryDependencies +=  "com.h2database" % "h2" % "1.3.175"
+
+unmanagedResourceDirectories in Compile <+= (baseDirectory / "static")
+
+//excludeFilter in unmanagedResources := HiddenFileFilter || "project*" || "target*" || "src*"

@@ -25,6 +25,7 @@ trait SimpleHttpService extends HttpService { self:NotesServiceComponent =>
 //    }
 
   val serviceRoute =
+  pathPrefix("rest") {
     pathPrefix("notes") {
       pathEnd {
         post {
@@ -33,7 +34,9 @@ trait SimpleHttpService extends HttpService { self:NotesServiceComponent =>
   //          validate(isValid,errorMessages.mkString(",")) {
               complete {
                 val id = getNoteService.save(note)
-                HttpResponse(status = StatusCodes.Created,headers = Location(s"notes/" + id)::Nil)
+                id.map {idLoct =>
+                  HttpResponse(status = StatusCodes.Created,headers = Location(s"/rest/notes/" + idLoct)::Nil)
+                }
               }
   //          }
           }
@@ -47,13 +50,13 @@ trait SimpleHttpService extends HttpService { self:NotesServiceComponent =>
       path(LongNumber) { id =>
         get {
           complete {
-            getNoteService.find(id)
+            getNoteService.find(id.toString)
           }
         } ~
         put {
           entity(as[Note]) {note =>
             complete {
-              getNoteService.update(id,note)
+              getNoteService.update(id.toString,note)
               StatusCodes.Created
             }
           }
@@ -67,5 +70,7 @@ trait SimpleHttpService extends HttpService { self:NotesServiceComponent =>
         }
       }
     }
+  } ~
+    getFromResourceDirectory("app")
 }
 
