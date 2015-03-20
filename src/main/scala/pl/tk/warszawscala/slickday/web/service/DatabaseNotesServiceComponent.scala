@@ -1,30 +1,39 @@
 package pl.tk.warszawscala.slickday.web.service
 
-import pl.tk.warszawscala.slickday.web.http.model.Note
-import pl.tk.warszawscala.slickday.web.repository.SlickNotesRepositoryComponent
+import pl.tk.warszawscala.slickday.web.http.model.{Category, Book, Author}
+import pl.tk.warszawscala.slickday.web.repository.SlickLibraryRepositoryComponent
 import slick.dbio._
 
 import scala.concurrent.Future
 
-trait DatabaseNotesServiceComponent extends NotesServiceComponent { self : SlickNotesRepositoryComponent =>
-  override def getNoteService : NoteService = new DataBaseNoteService
+trait DatabaseNotesServiceComponent extends LibraryServiceComponent { self : SlickLibraryRepositoryComponent =>
+  override def getLibraryService : NoteService = new DataBaseNoteService
 
   private class DataBaseNoteService extends NoteService {
-    def save(note: Note) : Future[String] = ???
+    override def save(note: Author): Future[Long] = ???
 
-    def query(author: Option[String], hashtag: Option[String]): Future[List[Note]] = ???
+    override def findAuthorById(id: Long): Future[Option[Author]] = ???
 
-    override def update(id: String, note: Note): Unit = ???
+    override def findCategoryById(id: Long): Future[Option[Category]] = ???
 
-    def getAll(): Future[List[Note]] = ???
+    override def findBookById(id: Long): Future[Option[Book]] = ???
 
-    def find(id: String): Future[Option[Note]] = {
-      val fromDatabase: DBIO[Seq[(Long, String, String)]] = getNotesRepository.find(id.toLong)
-      Future.successful(None)
-    }
+    override def getAllBooks(): Future[List[Book]] = ???
 
+    override def update(id: Long, note: Author): Unit = ???
 
+    override def update(id: Long, note: Book): Unit = ???
 
+    override def update(id: Long, note: Category): Unit = ???
 
+    override def getAllCategories(): Future[List[Category]] = ???
+
+    override def save(hashtag: Book): Future[Long] = ???
+
+    override def save(author: Category): Future[Long] = ???
+
+    override def query(author: Option[String], category: Option[String]): Future[List[Book]] = ???
+
+    override def getAllAuthors(): Future[List[Author]] = ???
   }
 }

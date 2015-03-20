@@ -3,7 +3,7 @@ package pl.tk.warszawscala.slickday
 import akka.actor.{ActorSystem, Props}
 import akka.io.IO
 import com.typesafe.config.{ConfigFactory, Config}
-import pl.tk.warszawscala.slickday.web.http.{MockNoteService, NoteService}
+import pl.tk.warszawscala.slickday.web.http.{MockLibraryService, LibraryService}
 import spray.can.Http
 
 object Boot extends App {
@@ -15,8 +15,8 @@ object Boot extends App {
   implicit val system = ActorSystem("notes-system")
   val service =
     if(runWithMock)
-      system.actorOf(Props[MockNoteService],"notes-service")
+      system.actorOf(Props[MockLibraryService],"notes-service")
     else
-      system.actorOf(Props[NoteService], "notes-service")
+      system.actorOf(Props[LibraryService], "notes-service")
   IO(Http) ! Http.Bind(service, interface, port = port)
 }

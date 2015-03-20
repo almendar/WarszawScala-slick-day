@@ -2,14 +2,10 @@ package pl.tk.warszawscala.slickday.web.repository
 
 import slick.driver.JdbcProfile
 
-
-
-
-
 /**
  * Create concrete implementation with slick
  */
-trait SlickNotesRepositoryComponent  extends NotesRepositoryComponent { self : JdbcProfile =>
+trait SlickLibraryRepositoryComponent  extends LibraryRepositoryComponent { self : JdbcProfile =>
 
   import api._
 
@@ -24,9 +20,9 @@ trait SlickNotesRepositoryComponent  extends NotesRepositoryComponent { self : J
 
   private val notesQuery = TableQuery[NotesTable]
 
-  override def getNotesRepository : SlickNotesRepository = new SlickNotesRepository
+  override def getLibraryRepository : SlickLibraryRepository = new SlickLibraryRepository
 
-  class SlickNotesRepository extends NotesRepository {
+  class SlickLibraryRepository extends LibraryRepository {
     def find(id:Long) : DBIO[Seq[NoteTuple]] = notesQuery.filter(_.id === id).result
   }
 
