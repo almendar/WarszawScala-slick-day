@@ -14,7 +14,7 @@ trait DatabaseLibraryServiceComponent extends LibraryServiceComponent { self : S
 
     override def findAuthorById(id: Long): Future[Option[Author]] = ???
 
-    override def findCategoryById(id: Long): Future[Option[Category]] = ???
+    override def findCategoryById(id: Long): Future[List[Category]] = ???
 
     override def findBookById(id: Long): Future[Option[Book]] = ???
 

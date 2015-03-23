@@ -39,7 +39,33 @@ trait MockLibraryRepositoryComponent extends LibraryRepositoryComponent {
 
   class MockLibraryRepository extends LibraryRepository {
     val authorRepo = new Repo[Author]
-    val categoryRepo = new Repo[Category]
+    val categoryRepo = new  {
+
+      private val lock : ReentrantLock = new ReentrantLock()
+      var store : List[Category] = List.empty[Category]
+      private val idGen = new AtomicLong()
+
+       def persist(a: Category): Long = {
+         lock.lock()
+         val newId = idGen.incrementAndGet();
+         store = a.copy(id = Some(newId)) :: store
+         lock.unlock()
+         newId
+       }
+
+       def get(id: Long): List[Category] = {
+        store.filter(_.parentId == Some(id)).map{cat =>
+          val hasChildren = store.exists(_.parentId == cat.getId)
+          if(hasChildren) cat.copy(hasChildren = true) else cat
+        }
+      }
+
+      def update(id: Long, a: Category): Unit = {
+        lock.lock
+        store = a.copy(id = Some(id)) :: store.filterNot(_.getId == Some(id))
+        lock.unlock()
+      }
+    }
     val bookRepo = new Repo[Book]
   }
   override val getLibraryRepository: MockLibraryRepository = new MockLibraryRepository

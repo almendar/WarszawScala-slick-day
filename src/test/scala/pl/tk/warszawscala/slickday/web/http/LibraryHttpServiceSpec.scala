@@ -24,9 +24,11 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
 
   var sampleAuthor = Author(None, "F. Scott Fitzgerald")
 
-  var sampleCategory1 = Category(None, "Great American Novel", None)
+  var sampleCategory1 = Category(None, "Great American Novel", None,true)
 
-  var sampleCategory2 = Category(None, "Rich people", None)
+  var sampleCategory2 = Category(None, "Rich people", None, false)
+
+  var sampleCategory3 = Category(None, "Poor people", None, false)
 
   var sampleBook: Book = Book(None, List.empty, "The Great Gatsby", sampleCategory2, LocalDate.of(1925, 10, 22))
 
@@ -84,7 +86,7 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
       locationHeader === Some(Location(Uri(s"$CATEGORIES_ENDPOINT/${generatedIndex.get}")))
     }
 
-    sampleCategory2 = sampleCategory2.copy(parentCategory = Some(sampleCategory1))
+    sampleCategory2 = sampleCategory2.copy(parentId = sampleCategory1.getId)
     Post(CATEGORIES_ENDPOINT, sampleCategory2) ~> serviceRoute ~> check {
       val uriRegex = s"""${CATEGORIES_ENDPOINT}/(\\d+)""".r
       val locationHeader = header("location")
@@ -93,6 +95,18 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
         case _ => None
       }
       sampleCategory2 = sampleCategory2.copy(id = generatedIndex.map(_.toLong))
+      locationHeader === Some(Location(Uri(s"$CATEGORIES_ENDPOINT/${generatedIndex.get}")))
+    }
+
+    sampleCategory3 = sampleCategory3.copy(parentId = sampleCategory1.getId)
+    Post(CATEGORIES_ENDPOINT, sampleCategory3) ~> serviceRoute ~> check {
+      val uriRegex = s"""${CATEGORIES_ENDPOINT}/(\\d+)""".r
+      val locationHeader = header("location")
+      val generatedIndex: Option[String] = locationHeader match {
+        case Some(Location(Uri(_, _, s, _, _))) => (uriRegex findFirstMatchIn s.toString).map(_.group(1))
+        case _ => None
+      }
+      sampleCategory3 = sampleCategory3.copy(id = generatedIndex.map(_.toLong))
       locationHeader === Some(Location(Uri(s"$CATEGORIES_ENDPOINT/${generatedIndex.get}")))
     }
 
@@ -124,12 +138,13 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
     }
   }
 
-  "retrieve category directly" in {
-    Get(s"$CATEGORIES_ENDPOINT/${sampleCategory2.id.get}") ~> serviceRoute ~> check {
-      println("Category:")
+  "retrieve parent category children directly" in {
+    Get(s"$CATEGORIES_ENDPOINT/${sampleCategory1.id.get}") ~> serviceRoute ~> check {
+      println(s"Category children of id:${sampleCategory1.id.get}")
       println(responseAs[String])
       println("*" * 20)
-      responseAs[Category] === sampleCategory2
+      responseAs[List[Category]] contains sampleCategory2
+      responseAs[List[Category]] contains sampleCategory3
     }
   }
 

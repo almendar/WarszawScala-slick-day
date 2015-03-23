@@ -32,7 +32,7 @@ trait LibraryServiceComponent { self  : LibraryRepositoryComponent =>
     def getAllAuthors() : Future[List[Author]]
 
     def findBookById(id:Long) : Future[Option[Book]]
-    def findCategoryById(id:Long) : Future[Option[Category]]
+    def findCategoryById(id:Long) : Future[List[Category]]
     def findAuthorById(id:Long) : Future[Option[Author]]
   }
 }

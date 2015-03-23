@@ -17,15 +17,13 @@ object MyJsonProtocol extends DefaultJsonProtocol {
 
     def read(value: JsValue) = value match {
       case JsNumber(value) =>
-        LocalDate.ofEpochDay(value.toLongExact)
+        LocalDate.ofEpochDay(value.toLong)
       case _ => deserializationError("LocalDateTime expected")
     }
   }
 
   implicit val authorFormat : RootJsonFormat[Author] = jsonFormat2(Author)
-
-  implicit val noteFormat: RootJsonFormat[Category] = rootFormat(lazyFormat(jsonFormat(Category,"id","name","parentCategory")))
-
+  implicit val noteFormat: RootJsonFormat[Category] =  jsonFormat4(Category)
   implicit val bookFormat : RootJsonFormat[Book] = jsonFormat5(Book)
 
 

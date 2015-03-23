@@ -16,8 +16,7 @@ case class Book(id:Option[Long],authors:List[Author],title:String, category : Ca
 
   override def getId: Option[Long] = id
 }
-case class Category(id:Option[Long],name:String,parentCategory:Option[Category]) extends IdTransform[Category] {
+case class Category(id:Option[Long],name:String, parentId:Option[Long], hasChildren:Boolean) extends IdTransform[Category] {
   override def withNewId(id: Long): Category = copy(id = Some(id))
-
   override def getId: Option[Long] = id
 }

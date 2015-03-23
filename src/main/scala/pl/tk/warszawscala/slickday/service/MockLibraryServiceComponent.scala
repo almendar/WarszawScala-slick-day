@@ -30,7 +30,7 @@ trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibra
 
     override def findAuthorById(id: Long): Future[Option[Author]] = Future.successful(getLibraryRepository.authorRepo.get(id))
 
-    override def findCategoryById(id: Long): Future[Option[Category]] = Future.successful(getLibraryRepository.categoryRepo.get(id))
+    override def findCategoryById(id: Long): Future[List[Category]] = Future.successful(getLibraryRepository.categoryRepo.get(id))
 
     override def findBookById(id: Long): Future[Option[Book]] = Future.successful(getLibraryRepository.bookRepo.get(id))
 
@@ -42,7 +42,9 @@ trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibra
 
     override def getAllBooks(): Future[List[Book]] = Future.successful(getLibraryRepository.bookRepo.store)
 
-    override def getAllCategories(): Future[List[Category]] = Future.successful(getLibraryRepository.categoryRepo.store)
+    override def getAllCategories(): Future[List[Category]] = Future.successful(getLibraryRepository.categoryRepo.store.filter{ cat =>
+      cat.parentId == None
+    })
 
     override def getAllAuthors(): Future[List[Author]] = Future.successful(getLibraryRepository.authorRepo.store)
 
