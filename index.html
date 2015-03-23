@@ -12,7 +12,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+		<link rel="stylesheet" href="css/theme/beige.css" id="theme">
 
 		<!-- Code syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -241,7 +241,7 @@ Table[(Long,String)](tag,"PLACES") {
 
 					</section>
 					<section>
-						<h4>Avoiding being tied to a specific driver</h4>
+						<h4>Avoid being tied to a specific driver</h4>
 						<pre><code data-trim class="scala">
 import slick.driver.{JdbcProfile,H2Driver}
 trait Repository { self : JdbcProfile =>
@@ -296,6 +296,7 @@ q.update((22,"Bob Marley")) //update row(s)
 artists.filter(_.id === 22)
 artists.drop(10).take(5)
 artists.sortBy(_.name.desc.nullsFirst)
+artists.length
 						</code></pre>
 					</section>
 					<section>
@@ -325,11 +326,116 @@ val userId =
 					</section>
 				</section>
 				<section>
+					<section>
+						<h2>Connecting to Database</h2>
+					</section>
+					<section>
+						<h4>Using typesafe config in application.conf</h4>
+						<pre><code data-trim>
+mydb = {
+  dataSourceClass = org.postgresql.ds.PGSimpleDataSource
+  properties = {
+    databaseName = "mydb"
+    user = "myuser"
+    password = "secret"
+  }
+  numThreads = 10
+}
+						</code></pre>
+						<pre><code data-trim class="scala">val db = Database.forConfig("mydb")</code></pre>
+					</section>
+					<section>
+						<h2>Other methods</h2>
+						<pre><code data-trim class="scala">
+val db1 = Database.forDataSource(dataSource: javax.sql.DataSource)
+val db2 = Database.forURL("jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver="org.h2.Driver")
+val db3 = Database.forName(jndiName: String)
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>How to combine all of what was said?</h3>
+						<ul>
+							<li>Slick uses a DBIO[T] abstraction for actions</li>
+							<li>
+								This is done for seperation of <b>WHAT</b> is to be done from <b>HOW</b> it is done and <b>WHERE</b> it is to be done
+								<ul>
+									<li>Driver abstraction</li>
+									<li>Database abstraction</li>
+									<li>Query composition abstraction</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Generating database scheme with initial data</h3>
+						<pre><code class="scala" data-trim>
+val setupAction: DBIO[Unit] = DBIO.seq(
+      (artists.schema ++ places.schema ++ shows.schema).create,
+      artists += ( -1, "Captain Jack"),
+      artists += ( -1, "Bob Marley"),
+      artists += ( -1, "Celine Dion")
+    )
+var db: Database = Database.forConfig("mydb")
+val r : Future[Unit] = db.run(setupAction)
+						</code></pre>
+					</section>
+					<section>
+						<h3>Multiple statements</h3>
+						<pre><code data-trim class="scala">
+def inserArtist(authorName:String) : DBIO[Long] = (artists returning artists.map(_.id)) += (-1,authorName)
+def insertPlace(note:String) : DBIO[Long] = (places returning places.map(_.id)) += (-1,note)
+def makeShow(author:Long,note:Long) = (shows += (author,note))
+
+val action = for {
+  newArtistId : Long &lt;- inserArtist("Elvis Presley")
+  newArtistId1 : Long &lt;- inserArtist("Bob Marley")
+  newPlaceId1 : Long &lt;- insertPlace("Hawaii")
+  newPlaceId2 : Long &lt;- insertPlace("Honolulu")
+  newPlaceId3 : Long &lt;- insertPlace("Jamaica")
+  _ &lt;- makeShow(newArtistId,newPlaceId1)
+  _ &lt;- makeShow(newAuthorId,newPlaceId2)
+  _ &lt;- makeShow(newArtistId1,newPlaceId3)
+} yield ()
+db.run(action)
+						</code></pre>
+					</section>
+					<section>
+						<h3>Queries and actions</h3>
+						<p>Only DBIO can be `run` on database</p>
+						<pre><code data-trim class="scala">
+val query: Query[Artist, (Long, String), Seq] = artists
+
+val query1: Query[Column[String], String, Seq] = 
+  artists.map(_.artistName)
+
+val query2: Column[Int] = artists.length
+
+//----------------------//
+val actionFromQuery : DBIO[Seq[(Long,String)]]  = query.result
+
+val materializedResult: Future[Seq[(Long, String)]] = 
+  db.run(actionFromQuery)
+						</code></pre>
+					</section>
+					<section>
+						<h3>Check your SQL</h3>
+						<pre><code data-trim class="scala">
+val maxId = artists.map(_.id).max
+val listOfSqls : Iterable[String] = maxId.result.statements
+listOfSqls.foreach(println)
+						</code></pre>
+					</section>
+				</section>
+				<section>
 					<h2>What was not discusses</h2>
 					<ul>
 						<li>Connection pools</li>
+						<li>Database thread pool</li>
 						<li>Schema code generation</li>
-						<li></li>
+						<li>Transactions</li>
+						<li>Streaming</li>
 					</ul>
 				</section>
 			</div>
