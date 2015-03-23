@@ -76,7 +76,7 @@
 				<section>
 					<h3>Hypothetical ORM Question!</h3>	
 					<p>How many databases hits can you see?</p>
-					<pre><code data-trim>
+					<pre><code data-trim class="java">
 List&lt;Person&gt; people = PeopleFinder.getByIds(Array.asList(2,9,17,234));
 List&lt;Address&gt; = people.stream()
   .map(Person::getAddress)
@@ -88,19 +88,22 @@ List&lt;Address&gt; = people.stream()
 					<section>
 						<h3>Slick Question!</h3>
 						<p>How many databases hits can you see?</p>
-						<pre><code data-trim>
+						<pre><code data-trim class="scala">
 val peopleQuery: Query[People,Person,Seq] = 
   people.filter(_.id inSet(Set(2,99,17,234)))
 
 val addressesQuery: Query[Addresses,Address,Seq] = 
   peopleQuery.flatMap(_.address)
+
+val addressesAction: DBIO[Seq[Address]] = addressesQuery.result
 						</code></pre>
 						<h1 class="fragment">0</h1>
 						</section>
 					<section>
-						<h3>Construct your queries lazy until they give you exactly what you need</h3>
-						<pre><code data-trim>
-val addressesAction: DBIO[Seq[Address]] = addressesQuery.result
+						<h3>Construct your queries lazy until they give you exactly what you need and run them 
+						explicitly on the database</h3>
+						<pre><code data-trim class="scala">
+
 val addresses: Future[Seq[Address]] = db.run(addressesAction)
 						</code></pre>
 					</section>
@@ -108,7 +111,7 @@ val addresses: Future[Seq[Address]] = db.run(addressesAction)
 				<section>
 					<section>
 						<h2>How about query languages?</h2>
-						<pre><code data-trim>
+						<pre><code data-trim class="java">
 String hql = "UPDATE Employee set salary = :salary "  + 
              "WHERE id = :employee_id";
 Query query = session.createQuery(hql);
@@ -122,7 +125,7 @@ int result = query.executeUpdate();
 						I event don't even know where to start...</h3>
 						<ul>
 							<li>String concatenation</li>
-							<li>The IDE support</li>
+							<li>The lack of IDE support</li>
 							<li>Little to none code reuse</li>
 						</ul>
 					</section>
@@ -130,7 +133,7 @@ int result = query.executeUpdate();
 				<section>
 					<section>
 						<h2>So maybe some fluent api builders?</h2>
-						<pre><code data-trim>
+						<pre><code data-trim class="java">
 						CriteriaQuery&lt;Pet&gt; cq = cb.createQuery(Pet.class);
 Root&lt;Pet&gt; pet = cq.from(Pet.class);
 Date someDate = new Date(...);
@@ -140,7 +143,7 @@ cq.where(cb.gt(pet.get(Pet_.birthday), date));
 					</section>
 					<section>
 						<img src="img/orly.jpg" height="300px" />
-						<pre><code data-trim>
+						<pre><code data-trim class="java">
 Property age = Property.forName("age");
 List peopleList = sess.createCriteria(Person.class)
     .add( Restrictions.disjunction()
@@ -155,13 +158,13 @@ List peopleList = sess.createCriteria(Person.class)
 					</section>
 					<section>
 						<p>Maybe this looks more pleasing:</p>
-						<pre><code data-trim>
+						<pre><code data-trim  class="scala">
 people.filter(p =&gt; (p.age &gt;= 0 || p.age  &lt;= 3) &amp;&amp; 
   p.name inSet(Set("Fritz", "Izi", "Pk"))) 
 						</code></pre>
 						<div class="fragment">
 						<p>Or this:</p>
-						<pre><code data-trim>
+						<pre><code data-trim  class="scala">
 for {
   p &lt;- people if (p.age &gt;= 0 || p.age  =&lt; 3) &amp;&amp; 
     p.name inSet(Set("Fritz", "Izi", "Pk"))
@@ -173,7 +176,7 @@ for {
 				<section>
 					<p>Some ORMs will fetch the whole object not only fields that you want</p>
 					<p>Compare that with slick:</p>
-					<pre><code data-trim>people.map(p =&gt; (p.name, p.age))</code></pre>
+					<pre><code data-trim  class="scala">people.map(p =&gt; (p.name, p.age))</code></pre>
 				</section>
 				<section>
 					<section>
@@ -182,7 +185,7 @@ for {
 					</section>
 					<section>
 					<h3>Sorry, you can't do this</h3>
-						<pre><code data-trim>
+						<pre><code data-trim  class="scala">
 case class Address( … )
 case class Person( …, address: Address )
 						</code></pre>
@@ -190,12 +193,12 @@ case class Person( …, address: Address )
 					</section>
 					<section>
 						<h2>Embrace SQL</h2>
-						<pre><code data-trim>
+						<pre><code data-trim class="sql">
 SELECT * 
 FROM Person 
 JOIN Address ON Person.addressId=Address.id;
 						</code></pre>
-						<pre><code data-trim>
+						<pre><code data-trim  class="scala">
 val tupledJoin: Query[(People,Addresses),(Person,Address), Seq]
   = people join addresses on (_.addressId === _.id)
 
@@ -208,12 +211,127 @@ val caseClassJoinResults = db.run(tupledJoin.result)
 					<section>
 						<h2>How to modify relations?</h2>
 						<p>It's the same story, you don't update the whole object but only an id like in SQL</p>
-						<p>Bonus is that id is the only thing you need</p>
+						<p>Bonus is that id is the only thing you need. We'll get back to this shortly.</p>
 					</section>
-
 				</section>
+				<section>
+					<section><h1>Working with Slick</h1></section>
+					<section>
+						<h4>Schema definition</h4>
+						<pre><code data-trim class="scala">import slick.driver.H2Driver.api._ //or any other driver</code></pre>
+						<pre><code data-trim class="scala">
+class Artist(tag:Tag) extends 
+Table[(Long,String)](tag,"ARTISTS")  {
+  def id : Rep[Long] = 
+  	column[Long]("ARTIST_ID",O.PrimaryKey,O.AutoInc)
+  def artistName : Rep[String] = 
+  	column[String]("ARTIST_NAME")
+  def * : ProvenShape[(Long,String)] = (id,artistName)
+}
 
+class Place(tag:Tag) extends 
+Table[(Long,String)](tag,"PLACES") {
+  def id : Rep[Long] = 
+  	column[Long]("PLACE_ID",O.PrimaryKey,O.AutoInc)
+  def placeName : Rep[String] = 
+  	column[String]("PLACE_NAME")
+  def * : ProvenShape[(Long,String)] = (id,placeName)
+}
+						</code></pre>
 
+					</section>
+					<section>
+						<h4>Avoiding being tied to a specific driver</h4>
+						<pre><code data-trim class="scala">
+import slick.driver.{JdbcProfile,H2Driver}
+trait Repository { self : JdbcProfile =>
+  import api._
+  //Define your tables here
+}
+class H2Repo extends Repository with H2Driver
+						</code></pre>
+					</section>
+					<section>
+						<h2>Relationships between entities</h2>
+						<pre><code data-trim class="scala">
+class Show(tag:Tag) extends 
+Table[(Long,Long)](tag,"SHOWS") {
+  def artistId : Rep[Long] = column[Long]("ARTIST_FID")
+  def placeId : Rep[Long] = column[Long]("PLACE_FID")
+  def * : ProvenShape[(Long,Long)] = (artistId,placeId)
+
+  def author = foreignKey("ARTIST_FK",artistId,TableQuery[Artist])(_.id)
+  def note = foreignKey("PLACE_FK",placeId,TableQuery[Place])(_.id)
+}
+						</code></pre>
+					</section>
+					<section>
+						<h3>Querying</h3>
+						<pre><code data-trim class="scala">
+//Place those below Table definitions
+val artists = TableQuery[Artist]
+val places = TableQuery[Place]
+val shows = TableQuery[Show]
+						</pre></code data-trim>
+						<div class="fragment">
+							<p>Seems pretty useless</p>
+							<pre><code data-trim class="scala">
+val q = for {
+	i &lt;- artists if(i.artistName === "Elvis Presley")
+} yield i
+							</code></pre>
+						</div>
+						<div class="fragment">
+							<p>But it is not</p>
+							<pre><code data-trim class="scala">
+q.result //get select result
+q.delete // delete row(s)
+q.update((22,"Bob Marley")) //update row(s)
+							</code></pre>
+						</div>
+					</section>
+					<section>
+						<h3>There's more</h3>
+						<pre><code data-trim class="scala">
+artists.filter(_.id === 22)
+artists.drop(10).take(5)
+artists.sortBy(_.name.desc.nullsFirst)
+						</code></pre>
+					</section>
+					<section>
+						<h2>Joining</h2>
+						<pre><code data-trim class="scala">
+val q  = for {
+  a &lt;- artists
+  p &lt;- places
+  s &lt;- shows if(s.placeId === p.id &amp;&amp; s.artistId === a.id)
+} yield (a.artistName,n.placeName)
+						</code></pre>
+						<p>`If` is needed, without it output will be carthesian product of tables</p>
+					</section>
+					<section>
+						<h2>Inserts</h2>
+						<pre><code data-trim class="scala" class="scala">
+//id's will be generated
+artists ++= Seq((-1,"Artist1"),(-1,"Artists2"))
+
+//Ommit fields that have default values or can be autogenerated
+artists.map(_.artistName) ++= Seq("Artist3","artist4")
+
+//Getting generated id
+val userId =
+  (artists returning artists.map(_.id)) += (-1, "Czesław Niemen")
+						</code></pre>
+					</section>
+				</section>
+				<section>
+					<h2>What was not discusses</h2>
+					<ul>
+						<li>Connection pools</li>
+						<li>Schema code generation</li>
+						<li></li>
+					</ul>
+				</section>
 			</div>
 
 		</div>
