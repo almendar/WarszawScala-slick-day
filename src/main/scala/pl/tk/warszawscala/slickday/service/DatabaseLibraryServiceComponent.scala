@@ -1,12 +1,12 @@
-package pl.tk.warszawscala.slickday.web.service
+package pl.tk.warszawscala.slickday.service
 
 import pl.tk.warszawscala.slickday.web.http.model.{Category, Book, Author}
-import pl.tk.warszawscala.slickday.web.repository.SlickLibraryRepositoryComponent
+import pl.tk.warszawscala.slickday.repository.SlickLibraryRepositoryComponent
 import slick.dbio._
 
 import scala.concurrent.Future
 
-trait DatabaseNotesServiceComponent extends LibraryServiceComponent { self : SlickLibraryRepositoryComponent =>
+trait DatabaseLibraryServiceComponent extends LibraryServiceComponent { self : SlickLibraryRepositoryComponent =>
   override def getLibraryService : NoteService = new DataBaseNoteService
 
   private class DataBaseNoteService extends NoteService {

@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 import org.specs2.mutable.Specification
 import pl.tk.warszawscala.slickday.web.http.model._
-import pl.tk.warszawscala.slickday.web.service.MockLibraryServiceComponent
+import pl.tk.warszawscala.slickday.service.{LibraryServiceComponent, MockLibraryServiceComponent}
 import spray.http.HttpHeaders.Location
 import spray.testkit.Specs2RouteTest
 import spray.http._
@@ -13,7 +13,9 @@ import spray.httpx.SprayJsonSupport._
 import MyJsonProtocol._
 
 
-class SimpleHttpServiceSpec extends Specification with Specs2RouteTest with SimpleHttpService with MockLibraryServiceComponent {
+trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with LibraryHttpService {
+  self: LibraryServiceComponent =>
+
   def actorRefFactory = system
 
   val AUTHORS_ENDPOINT: String = "/rest/authors"

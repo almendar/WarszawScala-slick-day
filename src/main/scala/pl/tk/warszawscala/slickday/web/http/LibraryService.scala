@@ -1,8 +1,8 @@
 package pl.tk.warszawscala.slickday.web.http
 
 import akka.actor.Actor
-import pl.tk.warszawscala.slickday.web.repository.SlickLibraryRepositoryComponent
-import pl.tk.warszawscala.slickday.web.service.{MockLibraryServiceComponent, DatabaseNotesServiceComponent}
+import pl.tk.warszawscala.slickday.repository.SlickLibraryRepositoryComponent
+import pl.tk.warszawscala.slickday.service.{MockLibraryServiceComponent, DatabaseLibraryServiceComponent}
 import slick.driver.H2Driver
 
 /**
@@ -10,8 +10,8 @@ import slick.driver.H2Driver
  */
 
 class LibraryService extends Actor
-  with SimpleHttpService
-  with DatabaseNotesServiceComponent
+  with LibraryHttpService
+  with DatabaseLibraryServiceComponent
   with SlickLibraryRepositoryComponent
   with H2Driver {
   def actorRefFactory = context

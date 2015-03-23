@@ -1,11 +1,11 @@
-package pl.tk.warszawscala.slickday.web.service
+package pl.tk.warszawscala.slickday.service
 
 import pl.tk.warszawscala.slickday.web.http.model.{Category, Book, Author}
 import slick.dbio.DBIO
 
 import scala.concurrent.Future
 
-import pl.tk.warszawscala.slickday.web.repository.{LibraryRepositoryComponent, SlickLibraryRepositoryComponent}
+import pl.tk.warszawscala.slickday.repository.{LibraryRepositoryComponent, SlickLibraryRepositoryComponent}
 /**
  * Created by tomaszk on 3/17/15.
  */

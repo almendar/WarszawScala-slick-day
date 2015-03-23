@@ -1,11 +1,11 @@
-package pl.tk.warszawscala.slickday.web.service
+package pl.tk.warszawscala.slickday.service
 
 import java.time.{ZonedDateTime, LocalDateTime}
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.locks.ReentrantLock
 
 import pl.tk.warszawscala.slickday.web.http.model._
-import pl.tk.warszawscala.slickday.web.repository.{MockLibraryrRepositoryComponent, LibraryRepositoryComponent}
+import pl.tk.warszawscala.slickday.repository.{MockLibraryRepositoryComponent, LibraryRepositoryComponent}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -13,7 +13,7 @@ import scala.concurrent.Future
  * Created by tomaszk on 3/19/15.
  */
 
-trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibraryrRepositoryComponent {
+trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibraryRepositoryComponent {
 
 
   override val getLibraryService: NoteService = new MockNoteService
