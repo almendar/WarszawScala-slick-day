@@ -18,6 +18,8 @@ libraryDependencies += "io.spray" %%  "spray-json" % "1.3.1"
 
 libraryDependencies +=  "io.spray" %% "spray-testkit" % sprayV % "test"
 
+libraryDependencies += "org.specs2" %% "specs2" % "2.4.17"
+
 libraryDependencies +=  "com.typesafe.slick" %% "slick" % "3.0.0-RC1"
 
 libraryDependencies +=  "org.slf4j" % "slf4j-nop" % "1.6.4"
