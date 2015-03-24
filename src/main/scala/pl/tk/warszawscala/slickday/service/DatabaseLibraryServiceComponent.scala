@@ -1,12 +1,12 @@
-package pl.tk.warszawscala.slickday.web.service
+package pl.tk.warszawscala.slickday.service
 
 import pl.tk.warszawscala.slickday.web.http.model.{Category, Book, Author}
-import pl.tk.warszawscala.slickday.web.repository.SlickLibraryRepositoryComponent
+import pl.tk.warszawscala.slickday.repository.SlickLibraryRepositoryComponent
 import slick.dbio._
 
 import scala.concurrent.Future
 
-trait DatabaseNotesServiceComponent extends LibraryServiceComponent { self : SlickLibraryRepositoryComponent =>
+trait DatabaseLibraryServiceComponent extends LibraryServiceComponent { self : SlickLibraryRepositoryComponent =>
   override def getLibraryService : NoteService = new DataBaseNoteService
 
   private class DataBaseNoteService extends NoteService {
@@ -14,7 +14,7 @@ trait DatabaseNotesServiceComponent extends LibraryServiceComponent { self : Sli
 
     override def findAuthorById(id: Long): Future[Option[Author]] = ???
 
-    override def findCategoryById(id: Long): Future[Option[Category]] = ???
+    override def findCategoryById(id: Long): Future[List[Category]] = ???
 
     override def findBookById(id: Long): Future[Option[Book]] = ???
 
@@ -35,5 +35,11 @@ trait DatabaseNotesServiceComponent extends LibraryServiceComponent { self : Sli
     override def query(author: Option[String], category: Option[String]): Future[List[Book]] = ???
 
     override def getAllAuthors(): Future[List[Author]] = ???
+
+    override def deleteCategory(l: Long): Unit = ???
+
+    override def deleteAuthor(l: Long): Unit = ???
+
+    override def deleteBook(l: Long): Unit = ???
   }
 }

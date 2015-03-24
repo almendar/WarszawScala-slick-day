@@ -10,12 +10,12 @@ import spray.util.LoggingContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import pl.tk.warszawscala.slickday.web.http.model.{Category, Author, Book, MyJsonProtocol}
-import pl.tk.warszawscala.slickday.web.service.LibraryServiceComponent
+import pl.tk.warszawscala.slickday.service.LibraryServiceComponent
 import MyJsonProtocol._
 
 
 
-trait SimpleHttpService extends HttpService {
+trait LibraryHttpService extends HttpService {
   self: LibraryServiceComponent =>
 
   import spray.json.DefaultJsonProtocol._
@@ -59,6 +59,12 @@ trait SimpleHttpService extends HttpService {
                     StatusCodes.Created
                   }
                 }
+              } ~
+              delete {
+                complete {
+                  getLibraryService.deleteAuthor(id)
+                  StatusCodes.NoContent
+                }
               }
           }
       } ~
@@ -86,14 +92,20 @@ trait SimpleHttpService extends HttpService {
                   getLibraryService.findCategoryById(id)
                 }
               } ~
-                put {
-                  entity(as[Category]) { category: Category =>
-                    complete {
-                      getLibraryService.update(id, category)
-                      StatusCodes.Created
-                    }
+              put {
+                entity(as[Category]) { category: Category =>
+                  complete {
+                    getLibraryService.update(id, category)
+                    StatusCodes.Created
                   }
                 }
+              } ~
+              delete {
+                complete {
+                  getLibraryService.deleteCategory(id)
+                  StatusCodes.NoContent
+                }
+              }
             }
         } ~
         pathPrefix("books") {
@@ -127,6 +139,12 @@ trait SimpleHttpService extends HttpService {
                       StatusCodes.Created
                     }
                   }
+                } ~
+                delete {
+                  complete {
+                    getLibraryService.deleteBook(id)
+                    StatusCodes.NoContent
+                  }
                 }
             } ~
             path("search") {
@@ -143,4 +161,3 @@ trait SimpleHttpService extends HttpService {
   } ~
   getFromResourceDirectory("public")
 }
-

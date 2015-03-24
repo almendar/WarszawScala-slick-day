@@ -1,11 +1,11 @@
-package pl.tk.warszawscala.slickday.web.service
+package pl.tk.warszawscala.slickday.service
 
 import java.time.{ZonedDateTime, LocalDateTime}
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.locks.ReentrantLock
 
 import pl.tk.warszawscala.slickday.web.http.model._
-import pl.tk.warszawscala.slickday.web.repository.{MockLibraryrRepositoryComponent, LibraryRepositoryComponent}
+import pl.tk.warszawscala.slickday.repository.{MockLibraryRepositoryComponent, LibraryRepositoryComponent}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -13,7 +13,7 @@ import scala.concurrent.Future
  * Created by tomaszk on 3/19/15.
  */
 
-trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibraryrRepositoryComponent {
+trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibraryRepositoryComponent {
 
 
   override val getLibraryService: NoteService = new MockNoteService
@@ -30,7 +30,7 @@ trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibra
 
     override def findAuthorById(id: Long): Future[Option[Author]] = Future.successful(getLibraryRepository.authorRepo.get(id))
 
-    override def findCategoryById(id: Long): Future[Option[Category]] = Future.successful(getLibraryRepository.categoryRepo.get(id))
+    override def findCategoryById(id: Long): Future[List[Category]] = Future.successful(getLibraryRepository.categoryRepo.get(id))
 
     override def findBookById(id: Long): Future[Option[Book]] = Future.successful(getLibraryRepository.bookRepo.get(id))
 
@@ -42,7 +42,12 @@ trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibra
 
     override def getAllBooks(): Future[List[Book]] = Future.successful(getLibraryRepository.bookRepo.store)
 
-    override def getAllCategories(): Future[List[Category]] = Future.successful(getLibraryRepository.categoryRepo.store)
+    override def getAllCategories(): Future[List[Category]] = Future.successful(getLibraryRepository.categoryRepo.store.filter{ cat =>
+      cat.parentId == None
+    }.map{cat =>
+      if(getLibraryRepository.categoryRepo.store.exists(_.parentId == cat.getId)) cat.copy(hasChildren = true)
+      else cat
+    })
 
     override def getAllAuthors(): Future[List[Author]] = Future.successful(getLibraryRepository.authorRepo.store)
 
@@ -61,5 +66,11 @@ trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibra
       }
 
     }
+
+    override def deleteCategory(l: Long): Unit = getLibraryRepository.categoryRepo.delete(l)
+
+    override def deleteAuthor(l: Long): Unit = getLibraryRepository.authorRepo.delete(l)
+
+    override def deleteBook(l: Long): Unit = getLibraryRepository.bookRepo.delete(l)
   }
 }

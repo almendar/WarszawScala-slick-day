@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 import org.specs2.mutable.Specification
 import pl.tk.warszawscala.slickday.web.http.model._
-import pl.tk.warszawscala.slickday.web.service.MockLibraryServiceComponent
+import pl.tk.warszawscala.slickday.service.{LibraryServiceComponent, MockLibraryServiceComponent}
 import spray.http.HttpHeaders.Location
 import spray.testkit.Specs2RouteTest
 import spray.http._
@@ -13,7 +13,9 @@ import spray.httpx.SprayJsonSupport._
 import MyJsonProtocol._
 
 
-class SimpleHttpServiceSpec extends Specification with Specs2RouteTest with SimpleHttpService with MockLibraryServiceComponent {
+trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with LibraryHttpService {
+  self: LibraryServiceComponent =>
+
   def actorRefFactory = system
 
   val AUTHORS_ENDPOINT: String = "/rest/authors"
@@ -22,9 +24,11 @@ class SimpleHttpServiceSpec extends Specification with Specs2RouteTest with Simp
 
   var sampleAuthor = Author(None, "F. Scott Fitzgerald")
 
-  var sampleCategory1 = Category(None, "Great American Novel", None)
+  var sampleCategory1 = Category(None, "Great American Novel", None,false)
 
-  var sampleCategory2 = Category(None, "Rich people", None)
+  var sampleCategory2 = Category(None, "Rich people", None, false)
+
+  var sampleCategory3 = Category(None, "Poor people", None, false)
 
   var sampleBook: Book = Book(None, List.empty, "The Great Gatsby", sampleCategory2, LocalDate.of(1925, 10, 22))
 
@@ -82,7 +86,7 @@ class SimpleHttpServiceSpec extends Specification with Specs2RouteTest with Simp
       locationHeader === Some(Location(Uri(s"$CATEGORIES_ENDPOINT/${generatedIndex.get}")))
     }
 
-    sampleCategory2 = sampleCategory2.copy(parentCategory = Some(sampleCategory1))
+    sampleCategory2 = sampleCategory2.copy(parentId = sampleCategory1.getId)
     Post(CATEGORIES_ENDPOINT, sampleCategory2) ~> serviceRoute ~> check {
       val uriRegex = s"""${CATEGORIES_ENDPOINT}/(\\d+)""".r
       val locationHeader = header("location")
@@ -94,9 +98,18 @@ class SimpleHttpServiceSpec extends Specification with Specs2RouteTest with Simp
       locationHeader === Some(Location(Uri(s"$CATEGORIES_ENDPOINT/${generatedIndex.get}")))
     }
 
-
+    sampleCategory3 = sampleCategory3.copy(parentId = sampleCategory1.getId)
+    Post(CATEGORIES_ENDPOINT, sampleCategory3) ~> serviceRoute ~> check {
+      val uriRegex = s"""${CATEGORIES_ENDPOINT}/(\\d+)""".r
+      val locationHeader = header("location")
+      val generatedIndex: Option[String] = locationHeader match {
+        case Some(Location(Uri(_, _, s, _, _))) => (uriRegex findFirstMatchIn s.toString).map(_.group(1))
+        case _ => None
+      }
+      sampleCategory3 = sampleCategory3.copy(id = generatedIndex.map(_.toLong))
+      locationHeader === Some(Location(Uri(s"$CATEGORIES_ENDPOINT/${generatedIndex.get}")))
+    }
   }
-
 
 
   "save a book" in {
@@ -122,17 +135,24 @@ class SimpleHttpServiceSpec extends Specification with Specs2RouteTest with Simp
     }
   }
 
-  "retrieve category directly" in {
-    Get(s"$CATEGORIES_ENDPOINT/${sampleCategory2.id.get}") ~> serviceRoute ~> check {
-      println("Category:")
+  "retrieve parent category children directly" in {
+    Get(s"$CATEGORIES_ENDPOINT/${sampleCategory1.id.get}") ~> serviceRoute ~> check {
+      println(s"Category children of id:${sampleCategory1.id.get}")
       println(responseAs[String])
       println("*" * 20)
-      responseAs[Category] === sampleCategory2
+      responseAs[List[Category]] contains sampleCategory2
+      responseAs[List[Category]] contains sampleCategory3
+    }
+  }
+
+  "parent category should have children set to true" in {
+    Get(s"$CATEGORIES_ENDPOINT") ~> serviceRoute ~> check {
+      responseAs[List[Category]] contains sampleCategory1.copy(hasChildren = true)
     }
   }
 
 
-  "retrieve that note in all books" in {
+  "retrieve that book in all books" in {
     Get(BOOKS_ENDPOINT) ~> serviceRoute ~> check {
       responseAs[List[Book]] must contain(sampleBook)
     }
@@ -146,4 +166,51 @@ class SimpleHttpServiceSpec extends Specification with Specs2RouteTest with Simp
       responseAs[Book] === sampleBook
     }
   }
+
+  "delete book directly" in {
+
+    Delete(s"$BOOKS_ENDPOINT/${sampleBook.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(BOOKS_ENDPOINT) ~> serviceRoute ~> check {
+      responseAs[List[Book]] must beEmpty
+    }
+  }
+
+  "delete author directly" in {
+
+    Delete(s"$AUTHORS_ENDPOINT/${sampleAuthor.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(AUTHORS_ENDPOINT) ~> serviceRoute ~> check {
+      responseAs[List[Author]] must beEmpty
+    }
+  }
+
+  "delete sub category" in {
+    Delete(s"$CATEGORIES_ENDPOINT/${sampleCategory2.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(s"$CATEGORIES_ENDPOINT/${sampleCategory1.id.get}") ~> serviceRoute ~> check {
+      responseAs[List[Category]] must contain(sampleCategory3)
+    }
+
+  }
+
+  "delete all categories" in {
+    Delete(s"$CATEGORIES_ENDPOINT/${sampleCategory1.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(s"$CATEGORIES_ENDPOINT") ~> serviceRoute ~> check {
+      responseAs[List[Category]] must beEmpty
+    }
+
+  }
+
+
+
 }

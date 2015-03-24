@@ -1,11 +1,11 @@
-package pl.tk.warszawscala.slickday.web.service
+package pl.tk.warszawscala.slickday.service
 
 import pl.tk.warszawscala.slickday.web.http.model.{Category, Book, Author}
 import slick.dbio.DBIO
 
 import scala.concurrent.Future
 
-import pl.tk.warszawscala.slickday.web.repository.{LibraryRepositoryComponent, SlickLibraryRepositoryComponent}
+import pl.tk.warszawscala.slickday.repository.{LibraryRepositoryComponent, SlickLibraryRepositoryComponent}
 /**
  * Created by tomaszk on 3/17/15.
  */
@@ -14,6 +14,12 @@ trait LibraryServiceComponent { self  : LibraryRepositoryComponent =>
   def getLibraryService : NoteService
 
   trait NoteService {
+
+    def deleteCategory(l: Long) : Unit
+
+    def deleteBook(l: Long) : Unit
+
+    def deleteAuthor(l: Long) : Unit
 
     def save(author: Author) : Future[Long]
 
@@ -32,7 +38,7 @@ trait LibraryServiceComponent { self  : LibraryRepositoryComponent =>
     def getAllAuthors() : Future[List[Author]]
 
     def findBookById(id:Long) : Future[Option[Book]]
-    def findCategoryById(id:Long) : Future[Option[Category]]
+    def findCategoryById(id:Long) : Future[List[Category]]
     def findAuthorById(id:Long) : Future[Option[Author]]
   }
 }

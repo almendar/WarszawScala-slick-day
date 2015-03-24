@@ -1,4 +1,4 @@
-package pl.tk.warszawscala.slickday.web.repository
+package pl.tk.warszawscala.slickday.repository
 
 trait LibraryRepositoryComponent {
 
