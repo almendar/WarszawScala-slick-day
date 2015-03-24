@@ -9,18 +9,16 @@
     <link rel="stylesheet" href="lib/angular-material/angular-material.css" />
     <link rel="stylesheet" href="app.css" />
   </head>
-
-  <body ng-app="slick" layout="column">
-
-    <md-toolbar layout="row">
-      <h1>WarszawScala Slick Notes</h1>
-    </md-toolbar>
-
-    <div flex layout="row">
-
+  <body layout="row" ng-app="slick">
+    <div layout="column" flex role="main">
+      <md-toolbar>
+        <h1 class="md-toolbar-tools">Slick library</h1>
+      </md-toolbar>
+      <md-content ng-view md-scroll-y flex class="md-padding"></md-content>
     </div>
 
     <script src="lib/angularjs/angular.js"></script>
+    <script src="lib/angularjs/angular-route.js"></script>
     <script src="lib/angularjs/angular-animate.js"></script>
     <script src="lib/angularjs/angular-aria.js"></script>
     <script src="lib/angular-material/angular-material.js"></script>
