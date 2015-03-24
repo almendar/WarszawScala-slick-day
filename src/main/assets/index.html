@@ -10,6 +10,17 @@
     <link rel="stylesheet" href="app.css" />
   </head>
   <body layout="row" ng-app="slick">
+    <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+      <md-toolbar>
+        <h1 class="md-toolbar-tools">Navigation</h1>
+      </md-toolbar>
+      <md-content flex role="navigation" ng-controller="NavCtrl as nav">
+        <md-button ng-click="nav.toggle()" class="md-primary" hide-gt-md>
+          Close
+        </md-button>
+        <div ng-include="'partial/nav.html'"></div>
+      </md-content>
+    </md-sidenav>
     <div layout="column" flex role="main">
       <md-toolbar>
         <h1 class="md-toolbar-tools">Slick library</h1>

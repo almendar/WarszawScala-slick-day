@@ -24,6 +24,25 @@
 		$routeProvider.otherwise("/books");
 	});
 
+	slick.controller("NavCtrl", function($mdSidenav, $location) {
+		this.toggle = function() {
+			$mdSidenav("left").toggle();
+		};
+		this.items = [{
+			route : "/books",
+			title : "Books"
+		}, {
+			route : "/authors",
+			title : "Authors"
+		}, {
+			route : "/categories",
+			title : "Categories"
+		}];
+		this.selected = function(item) {
+			return $location.path() === item.route;
+		}
+	})
+
 	slick.controller("BooksCtrl", function() {
 	});
 
