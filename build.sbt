@@ -39,3 +39,5 @@ WebKeys.packagePrefix in Assets := "public/"
 libraryDependencies += "org.webjars" % "angularjs" % "1.3.15"
 
 libraryDependencies += "org.webjars" % "angular-material" % "0.8.3"
+
+libraryDependencies += "org.webjars" % "foundation-icon-fonts" % "d596a3cfb3"

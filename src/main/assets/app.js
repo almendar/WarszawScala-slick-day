@@ -30,13 +30,16 @@
 		};
 		this.items = [{
 			route : "/books",
-			title : "Books"
+			title : "Books",
+			icon : "fi-book"
 		}, {
 			route : "/authors",
-			title : "Authors"
+			title : "Authors",
+			icon : "fi-torso"
 		}, {
 			route : "/categories",
-			title : "Categories"
+			title : "Categories",
+			icon : "fi-price-tag"
 		}];
 		this.selected = function(item) {
 			return $location.path() === item.route;
