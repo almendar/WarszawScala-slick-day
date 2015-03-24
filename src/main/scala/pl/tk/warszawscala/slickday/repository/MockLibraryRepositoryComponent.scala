@@ -35,6 +35,12 @@ trait MockLibraryRepositoryComponent extends LibraryRepositoryComponent {
       store = a :: store.filterNot(_.getId.get == id)
       lock.unlock()
     }
+
+    def delete(id:Long) : Unit = {
+      lock.lock()
+      store = store.filterNot(_.getId == Some(id))
+      lock.unlock()
+    }
   }
 
   class MockLibraryRepository extends LibraryRepository {
@@ -63,6 +69,18 @@ trait MockLibraryRepositoryComponent extends LibraryRepositoryComponent {
       def update(id: Long, a: Category): Unit = {
         lock.lock
         store = a.copy(id = Some(id)) :: store.filterNot(_.getId == Some(id))
+        lock.unlock()
+      }
+
+      def delete(l:Long) : Unit = {
+        def giveChildren(l : Long) : List[Category] = {
+          val children: List[Category] = store.filter(_.parentId == Some(l))
+          val grandChildren: List[Category] = children.flatMap(c => giveChildren(c.getId.get))
+          children ::: grandChildren
+        }
+        lock.lock()
+        val idsToRemove = l :: giveChildren(l).map(_.getId.get)
+        store = store.filterNot(c => idsToRemove.contains(c.getId.get))
         lock.unlock()
       }
     }

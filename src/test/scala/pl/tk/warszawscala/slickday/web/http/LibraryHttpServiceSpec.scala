@@ -24,7 +24,7 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
 
   var sampleAuthor = Author(None, "F. Scott Fitzgerald")
 
-  var sampleCategory1 = Category(None, "Great American Novel", None,true)
+  var sampleCategory1 = Category(None, "Great American Novel", None,false)
 
   var sampleCategory2 = Category(None, "Rich people", None, false)
 
@@ -109,10 +109,7 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
       sampleCategory3 = sampleCategory3.copy(id = generatedIndex.map(_.toLong))
       locationHeader === Some(Location(Uri(s"$CATEGORIES_ENDPOINT/${generatedIndex.get}")))
     }
-
-
   }
-
 
 
   "save a book" in {
@@ -148,8 +145,14 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
     }
   }
 
+  "parent category should have children set to true" in {
+    Get(s"$CATEGORIES_ENDPOINT") ~> serviceRoute ~> check {
+      responseAs[List[Category]] contains sampleCategory1.copy(hasChildren = true)
+    }
+  }
 
-  "retrieve that note in all books" in {
+
+  "retrieve that book in all books" in {
     Get(BOOKS_ENDPOINT) ~> serviceRoute ~> check {
       responseAs[List[Book]] must contain(sampleBook)
     }
@@ -163,4 +166,51 @@ trait LibraryHttpServiceSpec extends Specification with Specs2RouteTest with Lib
       responseAs[Book] === sampleBook
     }
   }
+
+  "delete book directly" in {
+
+    Delete(s"$BOOKS_ENDPOINT/${sampleBook.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(BOOKS_ENDPOINT) ~> serviceRoute ~> check {
+      responseAs[List[Book]] must beEmpty
+    }
+  }
+
+  "delete author directly" in {
+
+    Delete(s"$AUTHORS_ENDPOINT/${sampleAuthor.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(AUTHORS_ENDPOINT) ~> serviceRoute ~> check {
+      responseAs[List[Author]] must beEmpty
+    }
+  }
+
+  "delete sub category" in {
+    Delete(s"$CATEGORIES_ENDPOINT/${sampleCategory2.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(s"$CATEGORIES_ENDPOINT/${sampleCategory1.id.get}") ~> serviceRoute ~> check {
+      responseAs[List[Category]] must contain(sampleCategory3)
+    }
+
+  }
+
+  "delete all categories" in {
+    Delete(s"$CATEGORIES_ENDPOINT/${sampleCategory1.id.get}") ~> serviceRoute ~> check {
+      status mustEqual StatusCode.int2StatusCode(204)
+    }
+
+    Get(s"$CATEGORIES_ENDPOINT") ~> serviceRoute ~> check {
+      responseAs[List[Category]] must beEmpty
+    }
+
+  }
+
+
+
 }

@@ -44,6 +44,9 @@ trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibra
 
     override def getAllCategories(): Future[List[Category]] = Future.successful(getLibraryRepository.categoryRepo.store.filter{ cat =>
       cat.parentId == None
+    }.map{cat =>
+      if(getLibraryRepository.categoryRepo.store.exists(_.parentId == cat.getId)) cat.copy(hasChildren = true)
+      else cat
     })
 
     override def getAllAuthors(): Future[List[Author]] = Future.successful(getLibraryRepository.authorRepo.store)
@@ -63,5 +66,11 @@ trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibra
       }
 
     }
+
+    override def deleteCategory(l: Long): Unit = getLibraryRepository.categoryRepo.delete(l)
+
+    override def deleteAuthor(l: Long): Unit = getLibraryRepository.authorRepo.delete(l)
+
+    override def deleteBook(l: Long): Unit = getLibraryRepository.bookRepo.delete(l)
   }
 }

@@ -59,6 +59,12 @@ trait LibraryHttpService extends HttpService {
                     StatusCodes.Created
                   }
                 }
+              } ~
+              delete {
+                complete {
+                  getLibraryService.deleteAuthor(id)
+                  StatusCodes.NoContent
+                }
               }
           }
       } ~
@@ -86,14 +92,20 @@ trait LibraryHttpService extends HttpService {
                   getLibraryService.findCategoryById(id)
                 }
               } ~
-                put {
-                  entity(as[Category]) { category: Category =>
-                    complete {
-                      getLibraryService.update(id, category)
-                      StatusCodes.Created
-                    }
+              put {
+                entity(as[Category]) { category: Category =>
+                  complete {
+                    getLibraryService.update(id, category)
+                    StatusCodes.Created
                   }
                 }
+              } ~
+              delete {
+                complete {
+                  getLibraryService.deleteCategory(id)
+                  StatusCodes.NoContent
+                }
+              }
             }
         } ~
         pathPrefix("books") {
@@ -126,6 +138,12 @@ trait LibraryHttpService extends HttpService {
                       getLibraryService.update(id, book)
                       StatusCodes.Created
                     }
+                  }
+                } ~
+                delete {
+                  complete {
+                    getLibraryService.deleteBook(id)
+                    StatusCodes.NoContent
                   }
                 }
             } ~

@@ -15,6 +15,12 @@ trait LibraryServiceComponent { self  : LibraryRepositoryComponent =>
 
   trait NoteService {
 
+    def deleteCategory(l: Long) : Unit
+
+    def deleteBook(l: Long) : Unit
+
+    def deleteAuthor(l: Long) : Unit
+
     def save(author: Author) : Future[Long]
 
     def save(book: Book) : Future[Long]

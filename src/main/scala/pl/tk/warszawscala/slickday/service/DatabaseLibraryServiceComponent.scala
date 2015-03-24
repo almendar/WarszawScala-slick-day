@@ -35,5 +35,11 @@ trait DatabaseLibraryServiceComponent extends LibraryServiceComponent { self : S
     override def query(author: Option[String], category: Option[String]): Future[List[Book]] = ???
 
     override def getAllAuthors(): Future[List[Author]] = ???
+
+    override def deleteCategory(l: Long): Unit = ???
+
+    override def deleteAuthor(l: Long): Unit = ???
+
+    override def deleteBook(l: Long): Unit = ???
   }
 }
