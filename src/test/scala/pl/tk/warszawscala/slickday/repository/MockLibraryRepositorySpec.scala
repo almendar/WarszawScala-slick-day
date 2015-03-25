@@ -58,7 +58,7 @@ class MockLibraryRepositorySpec extends Specification with MockLibraryServiceCom
   }
   def e4 = {
     getLibraryService.deleteCategory(rc1WithId.getId.get)
-    (getLibraryService.getAllCategories().value.get.get must beEqualTo(List(rc2WithId, 1)))
+    (getLibraryService.getAllCategories().value.get.get must beEqualTo(List(rc2WithId))) and
     (getLibraryService.findCategoryById(rc1WithId.id.get).futureValue must beEmpty) and
     (getLibraryService.findCategoryById(cc1WithId.id.get).futureValue must beEmpty)
   }
