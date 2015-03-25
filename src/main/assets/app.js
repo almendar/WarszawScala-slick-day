@@ -24,7 +24,7 @@
 		$routeProvider.otherwise("/books");
 	});
 
-	slick.controller("NavCtrl", function($mdSidenav, $location) {
+	slick.controller("NavCtrl", function($mdSidenav, $mdMedia, $location, $scope) {
 		this.toggle = function() {
 			$mdSidenav("left").toggle();
 		};
@@ -43,8 +43,18 @@
 		}];
 		this.selected = function(item) {
 			return $location.path() === item.route;
-		}
-	})
+		};
+		this.current = function() {
+			return this.items.filter(function(item) {				
+				return this.selected(item);
+			}, this).pop();
+		};
+		$scope.$on("$routeChangeStart", function() {
+			if(!$mdMedia("gt-md")) {
+				$mdSidenav("left").close();
+			}
+		});
+	});
 
 	slick.controller("BooksCtrl", function() {
 	});

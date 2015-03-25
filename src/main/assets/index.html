@@ -10,21 +10,23 @@
     <link rel="stylesheet" href="lib/angular-material/angular-material.css" />
     <link rel="stylesheet" href="app.css" />
   </head>
-  <body layout="row" ng-app="slick">
+  <body layout="row" ng-app="slick" ng-controller="NavCtrl as nav">
     <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
       <md-toolbar>
-        <h1 class="md-toolbar-tools">Navigation</h1>
+        <h1 class="md-toolbar-tools">Slick library</h1>
       </md-toolbar>
-      <md-content flex role="navigation" ng-controller="NavCtrl as nav">
-        <md-button ng-click="nav.toggle()" class="md-primary" hide-gt-md>
-          Close
-        </md-button>
+      <md-content flex role="navigation">
         <div ng-include="'partial/nav.html'"></div>
       </md-content>
     </md-sidenav>
     <div layout="column" flex role="main">
       <md-toolbar>
-        <h1 class="md-toolbar-tools">Slick library</h1>
+        <div class="md-toolbar-tools" ng-click="nav.toggle()">
+          <div hide-gt-sm class="menu-icon" aria-label="Toggle Menu">
+            <md-icon md-font-icon="fi-list" />
+          </div>
+          <h1 class="md-toolbar-tools">{{nav.current().title}}</h1>
+        </div>
       </md-toolbar>
       <md-content ng-view md-scroll-y flex class="md-padding"></md-content>
     </div>
