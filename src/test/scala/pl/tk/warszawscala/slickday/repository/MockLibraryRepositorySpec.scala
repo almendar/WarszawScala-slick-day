@@ -8,6 +8,7 @@ import pl.tk.warszawscala.slickday.web.http.model.Category
  * Created by tomaszk on 3/25/15.
  */
 
+
 class MockLibraryRepositorySpec extends Specification with MockLibraryServiceComponent  {
 
   implicit class FutureUnpack[A](value : scala.concurrent.Future[A]) {
@@ -57,8 +58,8 @@ class MockLibraryRepositorySpec extends Specification with MockLibraryServiceCom
   }
   def e4 = {
     getLibraryService.deleteCategory(rc1WithId.getId.get)
-    getLibraryService.getAllCategories().value.get.get must beEqualTo(List(rc2WithId))
-    getLibraryService.findCategoryById(rc1WithId.id.get).futureValue must beEmpty
-    getLibraryService.findCategoryById(cc1WithId.id.get).futureValue must beEmpty
+    (getLibraryService.getAllCategories().value.get.get must beEqualTo(List(rc2WithId, 1)))
+    (getLibraryService.findCategoryById(rc1WithId.id.get).futureValue must beEmpty) and
+    (getLibraryService.findCategoryById(cc1WithId.id.get).futureValue must beEmpty)
   }
 }
