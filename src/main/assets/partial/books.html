@@ -1,1 +1,17 @@
-Books
+<md-list class="main">
+  <md-item ng-repeat="item in ctrl.items">
+	<md-item-content>
+		<md-button ng-click="ctrl.selected(item)" flex layout="row"> 
+			<div class="md-tile-left"><md-icon md-font-icon="fi-book" alt="{{item.title}}"/></div> 
+			<div class="md-tile-content" layout="column" layout-align="center start">
+				<h3>{{item.title}}</h3>
+				<h4>
+					<span ng-repeat-start="author in item.authors">{{author.name}}</span><!-- 
+					--><span ng-repeat-end ng-if="!$last">, </span>
+				<h4>
+			</div>
+		</md-button>
+	  </div>
+	</md-item-content>
+  </md-item>
+</md-list>

@@ -1,1 +1,13 @@
-Authors
+<md-list class="main">
+  <md-item ng-repeat="item in ctrl.items">
+	<md-item-content>
+		<md-button ng-click="ctrl.selected(item)" flex layout="row"> 
+			<div class="md-tile-left"><md-icon md-font-icon="fi-torso" alt="{{item.name}}"/></div> 
+			<div class="md-tile-content" layout="column" layout-align="center start">
+				<h3>{{item.name}}</h3>
+			</div>
+		</md-button>
+	  </div>
+	</md-item-content>
+  </md-item>
+</md-list>
