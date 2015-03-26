@@ -1,0 +1,16 @@
+.md-tile-left .md-font {
+	font-size: 48px;
+}
+
+md-list.main md-icon {
+	width: 48px;
+	height: 48px;
+	margin: 16px;
+}
+
+.menu-icon {
+	background: none;
+	border: none;
+	margin-right: 16px;
+	padding: 0;
+}

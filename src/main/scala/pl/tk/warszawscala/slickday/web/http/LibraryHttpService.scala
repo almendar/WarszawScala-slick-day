@@ -155,7 +155,9 @@ trait LibraryHttpService extends HttpService {
               }
             }
         }
-    }~
-      getFromResourceDirectory("app")
-
+  } ~
+  path("") {
+    getFromResource("public/index.html")
+  } ~
+  getFromResourceDirectory("public")
 }

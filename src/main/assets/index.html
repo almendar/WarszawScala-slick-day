@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+		
+		<link rel="stylesheet" href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+		<link rel="stylesheet" href="lib/foundation-icon-fonts/foundation-icons.css" />
+		<link rel="stylesheet" href="lib/angular-material/angular-material.css" />
+		<link rel="stylesheet" href="app.css" />
+	</head>
+	<body layout="row" ng-app="slick" ng-controller="NavCtrl as nav">
+		<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+			<md-toolbar>
+				<h1 class="md-toolbar-tools">Slick library</h1>
+			</md-toolbar>
+			<md-content flex role="navigation">
+				<div ng-include="'partial/nav.html'"></div>
+			</md-content>
+		</md-sidenav>
+		<div layout="column" flex role="main">
+			<md-toolbar>
+				<div class="md-toolbar-tools" ng-click="nav.toggle()">
+					<div hide-gt-sm class="menu-icon" aria-label="Toggle Menu">
+						<md-icon md-font-icon="fi-list" />
+					</div>
+					<h1 class="md-toolbar-tools">{{nav.current().title}}</h1>
+				</div>
+			</md-toolbar>
+			<md-content ng-view md-scroll-y flex class="md-padding"></md-content>
+		</div>
+
+		<script src="lib/angularjs/angular.js"></script>
+		<script src="lib/angularjs/angular-route.js"></script>
+		<script src="lib/angularjs/angular-resource.js"></script>
+		<script src="lib/angularjs/angular-animate.js"></script>
+		<script src="lib/angularjs/angular-aria.js"></script>
+		<script src="lib/angular-material/angular-material.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>

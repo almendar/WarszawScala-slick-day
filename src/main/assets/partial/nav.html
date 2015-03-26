@@ -1,0 +1,10 @@
+<md-list>
+	<md-item ng-repeat="item in nav.items">
+		<md-item-content>
+			<md-button flex layout="row" href="#{{item.route}}" ng-class="{'md-raised md-accent' : nav.selected(item)}">
+				<div class="md-tile-left"><md-icon md-font-icon="{{item.icon}}" alt="{{item.title}}"/></div>
+				<div class="md-tile-content">{{item.title}}</div>
+			</md-button>
+		</md-item-content>
+	</md-item>
+</md-list>
