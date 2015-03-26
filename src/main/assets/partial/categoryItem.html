@@ -1,12 +1,14 @@
 <md-item-content flex layout-align="start start" layout="column">
-	<md-button ng-click="ctrl.selected(item)" flex layout="row" layout-fill>
-		<div class="md-tile-left"><md-icon md-font-icon="{{ctrl.icon(item)}}" ng-click="ctrl.toggle(item)" alt="{{item.name}}"/></div>
-		<div class="md-tile-content" layout="column" layout-align="center start">
+    <div flex layout="row" layout-fill>
+    	<md-button ng-click="ctrl.toggle(item)">
+    		<md-icon md-font-icon="{{ctrl.icon(item)}}" alt="{{item.name}}"/>
+    	</md-button>
+		<md-button layout-fill ng-click="ctrl.selected(item, $event)">
 			<h3>{{item.name}}</h3>
-		</div>
-	</md-button>
+		</md-button>
+    </div>
 	<div flex layout="row" layout-fill ng-if="item.expanded">
-		<div style="width: 64px;"></div>
+		<div class="tree-strut"></div>
 		<md-list layout="column" layout-fill>
 			<div ng-repeat="item in item.children" ng-include="'partial/categoryItem.html'"/>
 		</md-list>
