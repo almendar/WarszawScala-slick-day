@@ -37,17 +37,22 @@
 
 			<div class="slides">
 				<section data-markdown>
+					<script type="text/template">
 					## Slick
 					#### (How to wrap your head around it if you're an ORM junkie)
-					##### Warsaw Scala Enthusiasts Meetup
+					####### Based on Slick 3.0.0-RC1
+					### Warsaw Scala Enthusiasts Meetup
 					By Tomasz Kogut / [@almendar](http://twitter.com/almendar)
 					2015.04.01
+				</script>
 				</section>
 				<section>
-					<h3>Before we dive into slick, let's talk what is wrong with ORM's?</h3>
-					<p class="fragment">Object-relational impedance mismatch<br/>(<a href="http://blogs.tedneward.com/2006/06/26/The+Vietnam+Of+Computer+Science.aspx">The Vietnam of Computer Science</a>)</p>
+					<h3>Let's talk about what's wrong with ORM?</h3>
+					<p class="fragment">Object-relational impedance mismatch<br/>
+						(<a href="http://blogs.tedneward.com/2006/06/26/The+Vietnam+Of+Computer+Science.aspx">The Vietnam of Computer Science</a>)</p>
 					<ul>
-						<li class="fragment">Leaky abstraction - you can feel it those are not objects</li>
+						<li class="fragment">Leaky abstraction. You can feel those are
+							not simple objects</li>
 						<li class="fragment">Very easy to start, very hard to bend it to all needs</li>
 						<li class="fragment">Complex, complicated, sometimes performance killer</li>
 						<li class="fragment">
@@ -57,12 +62,23 @@
 								<li>Referring to objects not fully fetched, ouside of the persistence context</li>
 							</ul>
 						</li>
-					</ul>		
+					</ul>
+				</section>
+				<section data-markdown>
+					<script type="text/template">
+					## Taken from PlayFramework documentation:
+					> You don’t need another DSL to access relational databases.
+					> SQL is already the best DSL for accessing relational databases.
+					> We don’t need to invent something new.
+
+					So what happened that Slick exists? <!-- .element: class="fragment" -->
+				</script>
 				</section>
 				<section>
-					<h2>What's so special about slick?</h2>
+					<h2>How Slick differs?</h2>
 					<ul>
-						<li class="fragment">A Functional Relational Mapper for Scala</li>
+						<li class="fragment">A Functional Relational Mapper for Scala
+							- it's all about composing stuff</li>
 						<li class="fragment">Does not try to mimic DB relations as objects</li>
 						<li class="fragment">Uses tuples</li>
 						<li class="fragment">You already know how to write code in it (collections-like API, for-comprehension FTW!)</li>
@@ -74,7 +90,7 @@
 				</section>
 
 				<section>
-					<h3>Hypothetical ORM Question!</h3>	
+					<h3>Hypothetical ORM Question!</h3>
 					<p>How many databases hits can you see?</p>
 					<pre><code data-trim class="java">
 List&lt;Person&gt; people = PeopleFinder.getByIds(Array.asList(2,9,17,234));
@@ -89,10 +105,10 @@ List&lt;Address&gt; = people.stream()
 						<h3>Slick Question!</h3>
 						<p>How many databases hits can you see?</p>
 						<pre><code data-trim class="scala">
-val peopleQuery: Query[People,Person,Seq] = 
+val peopleQuery: Query[People,Person,Seq] =
   people.filter(_.id inSet(Set(2,99,17,234)))
 
-val addressesQuery: Query[Addresses,Address,Seq] = 
+val addressesQuery: Query[Addresses,Address,Seq] =
   peopleQuery.flatMap(_.address)
 
 val addressesAction: DBIO[Seq[Address]] = addressesQuery.result
@@ -100,7 +116,7 @@ val addressesAction: DBIO[Seq[Address]] = addressesQuery.result
 						<h1 class="fragment">0</h1>
 						</section>
 					<section>
-						<h3>Construct your queries lazy until they give you exactly what you need and run them 
+						<h3>Construct your queries lazy until they give you exactly what you need and run them
 						explicitly on the database</h3>
 						<pre><code data-trim class="scala">
 
@@ -112,7 +128,7 @@ val addresses: Future[Seq[Address]] = db.run(addressesAction)
 					<section>
 						<h2>How about query languages?</h2>
 						<pre><code data-trim class="java">
-String hql = "UPDATE Employee set salary = :salary "  + 
+String hql = "UPDATE Employee set salary = :salary "  +
              "WHERE id = :employee_id";
 Query query = session.createQuery(hql);
 query.setParameter("salary", 1000);
@@ -121,13 +137,14 @@ int result = query.executeUpdate();
 						</code></pre>
 					</section>
 					<section>
-						<h3>What's wrong with this?
-						I event don't even know where to start...</h3>
+						<h3>What's wrong with this?</h3>
 						<ul>
 							<li>String concatenation</li>
-							<li>The lack of IDE support</li>
+							<li>The lack of IDE support*</li>
 							<li>Little to none code reuse</li>
 						</ul>
+						<br /><br />
+						<small>*might be not true</small>
 					</section>
 				</section>
 				<section>
@@ -159,14 +176,14 @@ List peopleList = sess.createCriteria(Person.class)
 					<section>
 						<p>Maybe this looks more pleasing:</p>
 						<pre><code data-trim  class="scala">
-people.filter(p =&gt; (p.age &gt;= 0 || p.age  &lt;= 3) &amp;&amp; 
-  p.name inSet(Set("Fritz", "Izi", "Pk"))) 
+people.filter(p =&gt; (p.age &gt;= 0 || p.age  &lt;= 3) &amp;&amp;
+  p.name inSet(Set("Fritz", "Izi", "Pk")))
 						</code></pre>
 						<div class="fragment">
 						<p>Or this:</p>
 						<pre><code data-trim  class="scala">
 for {
-  p &lt;- people if (p.age &gt;= 0 || p.age  =&lt; 3) &amp;&amp; 
+  p &lt;- people if (p.age &gt;= 0 || p.age  =&lt; 3) &amp;&amp;
     p.name inSet(Set("Fritz", "Izi", "Pk"))
 } yield p
 						</code></pre>
@@ -194,8 +211,8 @@ case class Person( …, address: Address )
 					<section>
 						<h2>Embrace SQL</h2>
 						<pre><code data-trim class="sql">
-SELECT * 
-FROM Person 
+SELECT *
+FROM Person
 JOIN Address ON Person.addressId=Address.id;
 						</code></pre>
 						<pre><code data-trim  class="scala">
@@ -220,20 +237,20 @@ val caseClassJoinResults = db.run(tupledJoin.result)
 						<h4>Schema definition</h4>
 						<pre><code data-trim class="scala">import slick.driver.H2Driver.api._ //or any other driver</code></pre>
 						<pre><code data-trim class="scala">
-class Artist(tag:Tag) extends 
+class Artist(tag:Tag) extends
 Table[(Long,String)](tag,"ARTISTS")  {
-  def id : Rep[Long] = 
+  def id : Rep[Long] =
   	column[Long]("ARTIST_ID",O.PrimaryKey,O.AutoInc)
-  def artistName : Rep[String] = 
+  def artistName : Rep[String] =
   	column[String]("ARTIST_NAME")
   def * : ProvenShape[(Long,String)] = (id,artistName)
 }
 
-class Place(tag:Tag) extends 
+class Place(tag:Tag) extends
 Table[(Long,String)](tag,"PLACES") {
-  def id : Rep[Long] = 
+  def id : Rep[Long] =
   	column[Long]("PLACE_ID",O.PrimaryKey,O.AutoInc)
-  def placeName : Rep[String] = 
+  def placeName : Rep[String] =
   	column[String]("PLACE_NAME")
   def * : ProvenShape[(Long,String)] = (id,placeName)
 }
@@ -254,7 +271,7 @@ class H2Repo extends Repository with H2Driver
 					<section>
 						<h2>Relationships between entities</h2>
 						<pre><code data-trim class="scala">
-class Show(tag:Tag) extends 
+class Show(tag:Tag) extends
 Table[(Long,Long)](tag,"SHOWS") {
   def artistId : Rep[Long] = column[Long]("ARTIST_FID")
   def placeId : Rep[Long] = column[Long]("PLACE_FID")
@@ -407,7 +424,7 @@ db.run(action)
 						<pre><code data-trim class="scala">
 val query: Query[Artist, (Long, String), Seq] = artists
 
-val query1: Query[Column[String], String, Seq] = 
+val query1: Query[Column[String], String, Seq] =
   artists.map(_.artistName)
 
 val query2: Column[Int] = artists.length
@@ -415,7 +432,7 @@ val query2: Column[Int] = artists.length
 //----------------------//
 val actionFromQuery : DBIO[Seq[(Long,String)]]  = query.result
 
-val materializedResult: Future[Seq[(Long, String)]] = 
+val materializedResult: Future[Seq[(Long, String)]] =
   db.run(actionFromQuery)
 						</code></pre>
 					</section>
