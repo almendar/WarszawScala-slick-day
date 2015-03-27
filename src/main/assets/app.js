@@ -1,6 +1,6 @@
 (function() {
 
-	var mockBackend = false;
+	var mockBackend = true;
 
 	var slick = angular.module("slick", ["ngRoute", "ngResource", "ngMaterial"]);
 

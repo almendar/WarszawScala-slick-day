@@ -1,4 +1,4 @@
-.md-tile-left .md-font {
+.md-button .md-font {
 	font-size: 48px;
 }
 
@@ -13,4 +13,14 @@ md-list.main md-icon {
 	border: none;
 	margin-right: 16px;
 	padding: 0;
+}
+
+.tree-strut {
+	width: 44px;
+}
+
+.main .md-button h3 {
+	text-align: left;
+	text-transform: none;
+	font-weight: normal;
 }
