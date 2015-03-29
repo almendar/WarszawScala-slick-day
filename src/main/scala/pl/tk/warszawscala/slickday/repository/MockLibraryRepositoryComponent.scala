@@ -13,16 +13,15 @@ import pl.tk.warszawscala.slickday.web.http.model._
 trait MockLibraryRepositoryComponent extends LibraryRepositoryComponent {
 
   class Repo[A <: IdTransform[A]] {
+    import Locking._
 
-    private val lock : ReentrantLock = new ReentrantLock()
+    private implicit val lock : ReentrantLock = new ReentrantLock()
     var store : List[A] = List.empty[A]
     private val idGen = new AtomicLong()
 
-    def persist(a:A) : Long = {
-      lock.lock()
+    def persist(a:A) : Long = locked {
       val entity: A = a.withNewId(idGen.getAndIncrement)
       store = entity :: store
-      lock.unlock()
       entity.getId.get
     }
 
@@ -30,32 +29,28 @@ trait MockLibraryRepositoryComponent extends LibraryRepositoryComponent {
       store.filter(_.getId.get == id).headOption
     }
 
-    def update(id:Long,a:A) : Unit = {
-      lock.lock()
+    def update(id:Long,a:A) : Unit = locked {
       store = a :: store.filterNot(_.getId.get == id)
-      lock.unlock()
     }
 
-    def delete(id:Long) : Unit = {
-      lock.lock()
+    def delete(id:Long) : Unit = locked {
       store = store.filterNot(_.getId == Some(id))
-      lock.unlock()
     }
   }
 
   class MockLibraryRepository extends LibraryRepository {
+    import Locking._
+
     val authorRepo = new Repo[Author]
     val categoryRepo = new  {
 
-      private val lock : ReentrantLock = new ReentrantLock()
+      private implicit val lock : ReentrantLock = new ReentrantLock()
       var store : List[Category] = List.empty[Category]
       private val idGen = new AtomicLong()
 
-       def persist(a: Category): Long = {
-         lock.lock()
-         val newId = idGen.incrementAndGet();
+       def persist(a: Category): Long = locked {
+         val newId = idGen.incrementAndGet()
          store = a.copy(id = Some(newId)) :: store
-         lock.unlock()
          newId
        }
 
@@ -66,10 +61,8 @@ trait MockLibraryRepositoryComponent extends LibraryRepositoryComponent {
         }
       }
 
-      def update(id: Long, a: Category): Unit = {
-        lock.lock
+      def update(id: Long, a: Category): Unit = locked {
         store = a.copy(id = Some(id)) :: store.filterNot(_.getId == Some(id))
-        lock.unlock()
       }
 
       def delete(l:Long) : Unit = {
@@ -78,13 +71,23 @@ trait MockLibraryRepositoryComponent extends LibraryRepositoryComponent {
           val grandChildren: List[Category] = children.flatMap(c => giveChildren(c.getId.get))
           children ::: grandChildren
         }
-        lock.lock()
-        val idsToRemove = l :: giveChildren(l).map(_.getId.get)
-        store = store.filterNot(c => idsToRemove.contains(c.getId.get))
-        lock.unlock()
+
+        locked {
+          val idsToRemove = l :: giveChildren(l).map(_.getId.get)
+          store = store.filterNot(c => idsToRemove.contains(c.getId.get))
+        }
       }
     }
     val bookRepo = new Repo[Book]
   }
   override val getLibraryRepository: MockLibraryRepository = new MockLibraryRepository
+
+  object Locking {
+    def locked[A](f: => A)(implicit lock: ReentrantLock): A = {
+      lock.lock()
+      val result = f
+      lock.unlock()
+      result
+    }
+  }
 }
