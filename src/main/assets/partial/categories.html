@@ -1,3 +1,13 @@
-<md-list class="main">
-	<div ng-repeat="item in ctrl.items" ng-include="'partial/categoryItem.html'"></div>
-</md-list>
+<div layout="column" layout-align="space-between center">
+	<md-list class="main" layout="column" layout-align="start start" layout-fill>
+		<div layout-fill ng-repeat="item in ctrl.items" ng-include="'partial/categoryItem.html'"></div>
+	</md-list>
+	<div layout="row" layout-align="space-between center" layout-fill>
+		<div></div>
+		<div>
+			<md-button class="md-fab md-primary" aria-label="Add category" ng-click="ctrl.add()">
+				<md-icon md-font-icon="fi-plus" title="Add category"/>
+			</md-button>
+		</div>
+	</div>		
+</div>

@@ -1,17 +1,27 @@
-<md-list class="main">
-  <md-item ng-repeat="item in ctrl.items">
-	<md-item-content>
-		<md-button layout-fill ng-click="ctrl.selected(item)">
-		    <div layout="row" layout-align="start start"> 
-				<div>
-					<md-icon md-font-icon="fi-torso" alt="{{item.name}}" />
-				</div> 
-				<div layout-fill layout="column" layout-align="center start">
-					<h3>{{item.name}}</h3>
-				</div>
-			</div>
-		</md-button>
-	  </div>
-	</md-item-content>
-  </md-item>
-</md-list>
+<div layout="column" layout-align="space-between center">
+	<md-list class="main" layout="column" layout-align="start start" layout-fill>
+		<md-item ng-repeat="item in ctrl.items" layout-fill>
+			<md-item-content>
+				<md-button layout-fill ng-click="ctrl.selected(item)">
+					<div layout="row" layout-align="start start"> 
+						<div>
+							<md-icon md-font-icon="fi-torso" alt="{{item.name}}" />
+						</div> 
+						<div layout-fill layout="column" layout-align="center start">
+							<h3>{{item.name}}</h3>
+						</div>
+					</div>
+				</md-button>
+			  </div>
+			</md-item-content>
+		</md-item>
+	</md-list>
+	<div layout="row" layout-align="space-between center" layout-fill>
+		<div></div>
+		<div>
+			<md-button class="md-fab md-primary" aria-label="Add author" ng-click="ctrl.add()">
+				<md-icon md-font-icon="fi-plus" title="Add author"/>
+			</md-button>
+		</div>
+	</div>	
+</div>

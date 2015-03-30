@@ -6,6 +6,11 @@
 	margin-top: 0px;
 }
 
+.md-button.md-fab md-icon {
+	margin-top: -30px;
+	margin-left: -10px;
+}
+
 md-list.main md-icon {
 	width: 48px;
 	height: 48px;
