@@ -7,10 +7,10 @@ import slick.dbio._
 import scala.concurrent.Future
 
 trait DatabaseLibraryServiceComponent extends LibraryServiceComponent { self : SlickLibraryRepositoryComponent =>
-  override def getLibraryService : NoteService = new DataBaseNoteService
+  override def getLibraryService : LibraryService = new DataBaseNoteService
 
-  private class DataBaseNoteService extends NoteService {
-    override def save(note: Author): Future[Long] = ???
+  private class DataBaseNoteService extends LibraryService {
+    override def save(author: Author): Future[Long] = ???
 
     override def findAuthorById(id: Long): Future[Option[Author]] = ???
 
@@ -20,17 +20,17 @@ trait DatabaseLibraryServiceComponent extends LibraryServiceComponent { self : S
 
     override def getAllBooks(): Future[List[Book]] = ???
 
-    override def update(id: Long, note: Author): Unit = ???
+    override def update(id: Long, author: Author): Unit = ???
 
-    override def update(id: Long, note: Book): Unit = ???
+    override def update(id: Long, book: Book): Unit = ???
 
-    override def update(id: Long, note: Category): Unit = ???
+    override def update(id: Long, category: Category): Unit = ???
 
     override def getAllCategories(): Future[List[Category]] = ???
 
-    override def save(hashtag: Book): Future[Long] = ???
+    override def save(book: Book): Future[Long] = ???
 
-    override def save(author: Category): Future[Long] = ???
+    override def save(category: Category): Future[Long] = ???
 
     override def query(author: Option[String], category: Option[String]): Future[List[Book]] = ???
 

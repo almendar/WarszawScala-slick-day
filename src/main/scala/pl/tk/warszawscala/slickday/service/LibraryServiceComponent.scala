@@ -11,9 +11,9 @@ import pl.tk.warszawscala.slickday.repository.{LibraryRepositoryComponent, Slick
  */
 trait LibraryServiceComponent { self  : LibraryRepositoryComponent =>
 
-  def getLibraryService : NoteService
+  def getLibraryService : LibraryService
 
-  trait NoteService {
+  trait LibraryService {
 
     def deleteCategory(l: Long) : Unit
 

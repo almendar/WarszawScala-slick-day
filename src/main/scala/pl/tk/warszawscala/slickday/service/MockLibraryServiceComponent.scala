@@ -16,11 +16,11 @@ import scala.concurrent.Future
 trait MockLibraryServiceComponent extends LibraryServiceComponent with MockLibraryRepositoryComponent {
 
 
-  override val getLibraryService: NoteService = new MockNoteService
+  override val getLibraryService: LibraryService = new MockNoteService
 
 //  override val getLibraryRepository = new MockLibraryrRepositoryComponent {}
 
-  private class MockNoteService extends NoteService {
+  private class MockNoteService extends LibraryService {
 
     override def save(author: Author): Future[Long] = Future.successful(getLibraryRepository.authorRepo.persist(author))
 
