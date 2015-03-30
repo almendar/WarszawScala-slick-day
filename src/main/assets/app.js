@@ -96,9 +96,11 @@
 			if(item.hasChildren) {
 				item.expanded = !item.expanded;
 				if(item.expanded && !item.children) {
-					backend.category.query(item.id).then(function(children) {
+					backend.category.query({ 
+							id : item.id 
+						}, function(children) {
 						item.children = children;
-					})
+					});
 				}				
 			}
 		};
@@ -144,16 +146,14 @@
 					}
 				},
 				category : {
-					query : function(id) {
-						return $q(function(resolve, reject) {
-							resolve([{
-								"name" : "Category with children",
-								"hasChildren" : true
-							}, {
-								"name" : "Category with no children",
-								"hasChildren" : false
-							}]);
-						});
+					query : function(id, success) {
+						success([{
+							"name" : "Category with children",
+							"hasChildren" : true
+						}, {
+							"name" : "Category with no children",
+							"hasChildren" : false
+						}]);
 					}
 				}
 			}
