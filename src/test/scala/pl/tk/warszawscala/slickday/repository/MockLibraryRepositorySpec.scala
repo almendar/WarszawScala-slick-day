@@ -36,9 +36,9 @@ class MockLibraryRepositorySpec extends Specification with MockLibraryServiceCom
 
   def is = sequential ^  s2"""
 
- This is a specification to check if categories are persisted in service mock correclty
+ This is a specification to check if categories are persisted in service mock correctly
 
- The 'Category persistance' should
+ The 'Category persistence' should
    return all root categories                                    $e1
    return child of root category                                 $e2
    return child of a non-root category                           $e3
