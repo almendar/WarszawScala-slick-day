@@ -1,10 +1,14 @@
 <md-list class="main">
   <md-item ng-repeat="item in ctrl.items">
 	<md-item-content>
-		<md-button ng-click="ctrl.selected(item)" flex layout="row"> 
-			<div class="md-tile-left"><md-icon md-font-icon="fi-torso" alt="{{item.name}}"/></div> 
-			<div class="md-tile-content" layout="column" layout-align="center start">
-				<h3>{{item.name}}</h3>
+		<md-button layout-fill ng-click="ctrl.selected(item)">
+		    <div layout="row" layout-align="start start"> 
+				<div>
+					<md-icon md-font-icon="fi-torso" alt="{{item.name}}" />
+				</div> 
+				<div layout-fill layout="column" layout-align="center start">
+					<h3>{{item.name}}</h3>
+				</div>
 			</div>
 		</md-button>
 	  </div>
