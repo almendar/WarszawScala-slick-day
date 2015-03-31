@@ -108,14 +108,25 @@
 			authors : []
 		};
 		this.book = book;
+		this.selectedAuthors = function(state) {
+			return authors.filter(function(item) {
+				return !state && angular.isUndefined(item.selected) || state === item.selected;
+			});
+		}
 		this.addAuthor = function() {
-			book.authors.push(this.author);
-			this.authors = this.authors.filter(function(other) {
-				return other.id !== this.author.id;
-			}, this);
+			this.author.selected = true;
 			delete this.author;
 		};
+		this.removeAuthor = function($index) {
+			this.selectedAuthors(true)[$index].selected = false;
+		}
 		this.save = function() {
+			this.selectedAuthors(true).forEach(function(item) {
+				book.authors.push({
+					id : item.id,
+					name : item.name
+				});
+			});
 			backend.books.save(book, function() {
 				notify("Saved");
 				$location.path("/books")

@@ -11,6 +11,14 @@
 	margin-left: -10px;
 }
 
+.md-button.md-raised {
+	width: 76px;
+}
+
+.md-whiteframe-z1 div:not(:last-child)[layout=row] {
+	margin-bottom: 8px;
+}
+
 md-list.main md-icon {
 	width: 48px;
 	height: 48px;
