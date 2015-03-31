@@ -1,6 +1,6 @@
 (function() {
 
-	var slick = angular.module("slick", ["ngRoute", "ngResource", "ngMaterial"]);
+	var slick = angular.module("slick", ["ngRoute", "ngResource", "ngMessages", "ngMaterial"]);
 
 	slick.config(function($mdThemingProvider, $mdIconProvider) {
 		$mdThemingProvider.theme('default')

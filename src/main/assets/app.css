@@ -19,6 +19,11 @@
 	margin-bottom: 8px;
 }
 
+.md-whiteframe-z1 [ng-message], .md-whiteframe-z1 .feedback {
+  font-size: 12px;
+  line-height: 24px;
+}
+
 .md-whiteframe-z1 {
 	margin-bottom: 26px;
 }

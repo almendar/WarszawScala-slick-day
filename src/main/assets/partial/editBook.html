@@ -1,9 +1,13 @@
-<form name="ctrl.form">
+<form name="form">
 	<div layout="column">
 		<md-input-container>
 			<label>Title</label>
-			<input type="text" ng-model="ctrl.book.title" required>
+			<input type="text" ng-model="ctrl.book.title" name="title" required>
+			<div class="errors" ng-messages="form.title.$error">
+				<div ng-message="required">Required</div>
+			</div>				
 		</md-input-container>
+
 		<span class="md-subhead">Authors</span>
 		<md-whiteframe class="md-whiteframe-z1" layout-padding layout="column">
 			<div layout-fill layout="row" layout-align="space-between center" ng-repeat="author in ctrl.selectedAuthors(true)">
@@ -16,6 +20,7 @@
 				</md-select>
 				<md-button style="margin-left: 8px;" class="md-raised" ng-disabled="!ctrl.author" ng-click="ctrl.addAuthor()">Add</md-button>
 			</div>
+			<div class="feedback" ng-if="ctrl.selectedAuthors(true).length == 0">Required</div>
 		</md-whiteframe>
 
 		<span class="md-subhead">Category</span>
@@ -23,10 +28,13 @@
 			<md-select layout-fill ng-model="ctrl.category" name="category" placeholder="Choose" required>
 				<md-option ng-value="category" ng-repeat="category in ctrl.categories">{{category.path}}</md-option>
 			</md-select>
+			<div class="errors" ng-messages="form.category.$error">
+				<div ng-message="required">Required</div>
+			</div>		
 		</md-whiteframe>
 
 		<div layout="row" flex layout-align="end center" style="margin-top: 8px;">
-			 <md-button class="md-raised md-primary" ng-click="ctrl.save()">Save</md-button>
+			 <md-button class="md-raised md-primary" ng-click="ctrl.save()" ng-disabled="form.$invalid || ctrl.selectedAuthors(true).length == 0">Save</md-button>
 		</div>
 	</div>
 </form>
