@@ -47,7 +47,7 @@
 				</script>
 				</section>
 				<section>
-					<h3>Let's talk about what's wrong with ORM?</h3>
+					<h3>Let's talk about what is wrong with ORM?</h3>
 					<p class="fragment">Object-relational impedance mismatch<br/>
 						(<a href="http://blogs.tedneward.com/2006/06/26/The+Vietnam+Of+Computer+Science.aspx">The Vietnam of Computer Science</a>)</p>
 					<ul>
@@ -83,7 +83,7 @@
 						<li class="fragment">Uses tuples</li>
 						<li class="fragment">You already know how to write code in it (collections-like API, for-comprehension FTW!)</li>
 						<li class="fragment">Flexible query composition</li>
-						<li class="fragment">It's very specific when it hits the database so it's easier to track side-effects</li>
+						<li class="fragment">It's very specific when it hits the database so it is easier to track side-effects</li>
 						<li class="fragment">It's type safe</li>
 						<li class="fragment">Embraces SQL and maps it to Scala features</li>
 					</ul>
@@ -156,7 +156,7 @@ Root&lt;Pet&gt; pet = cq.from(Pet.class);
 Date someDate = new Date(...);
 cq.where(cb.gt(pet.get(Pet_.birthday), date));
 </code></pre>
-				<p class="fragment">Ain't so bad...</p>
+				<img src="img/not_bad.jpg" class="fragment" height="300px"></img>
 					</section>
 					<section>
 						<img src="img/orly.jpg" height="300px" />
@@ -201,7 +201,7 @@ for {
 						<p>How to operate on them in slick?</p>
 					</section>
 					<section>
-					<h3>Sorry, you can't do this</h3>
+					<h3>Sorry, you can not do this</h3>
 						<pre><code data-trim  class="scala">
 case class Address( … )
 case class Person( …, address: Address )
@@ -229,6 +229,28 @@ val caseClassJoinResults = db.run(tupledJoin.result)
 						<h2>How to modify relations?</h2>
 						<p>It's the same story, you don't update the whole object but only an id like in SQL</p>
 						<p>Bonus is that id is the only thing you need. We'll get back to this shortly.</p>
+					</section>
+				</section>
+				<section>
+					<section data-markdown>
+					<script type="text/template">
+						#WARNING JPA folks!
+						## Check your database for isolation-levels 
+						Since there is no mechnism between you and your database there is no such thing as
+						["Optimistic concurrency control"](http://en.wikipedia.org/wiki/Optimistic_concurrency_control) or anything that will help you.
+						</script>
+					</section>
+					<section data-markdown>
+					<script type="text/template">
+					[Taken from PostgresSQL documentation](http://www.postgresql.org/docs/9.4/static/transaction-iso.html)
+
+| Isolation Level |Dirty Read| Nonrepeatable Read | Phantom Read |
+| ----------------|----------------|:-------------| -------------|
+|Read uncommitted |	Possible 	  | Possible 	  | Possible     |
+|Read committed   |	Not possible  | Possible 	  | Possible     |
+|Repeatable read  |	Not possible  |	Not possible  | Possible     |
+|Serializable 	  | Not possible  |	Not possible  | Not possible |
+					</script>
 					</section>
 				</section>
 				<section>
@@ -291,7 +313,7 @@ val places = TableQuery[Place]
 val shows = TableQuery[Show]
 						</pre></code data-trim>
 						<div class="fragment">
-							<p>Seems pretty useless</p>
+							<p>Query is not just a query...</p>
 							<pre><code data-trim class="scala">
 val q = for {
 	i &lt;- artists if(i.artistName === "Elvis Presley")
@@ -299,7 +321,7 @@ val q = for {
 							</code></pre>
 						</div>
 						<div class="fragment">
-							<p>But it is not</p>
+							<p>it is also:</p>
 							<pre><code data-trim class="scala">
 q.result //get select result
 q.delete // delete row(s)
