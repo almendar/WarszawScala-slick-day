@@ -1,7 +1,5 @@
 (function() {
 
-	var mockBackend = false;
-
 	var slick = angular.module("slick", ["ngRoute", "ngResource", "ngMaterial"]);
 
 	slick.config(function($mdThemingProvider, $mdIconProvider) {
@@ -189,64 +187,12 @@
 	});
 
 	slick.service("backend", function($resource, $q) {
-		if(mockBackend) {
-			return {
-				books : {
-					query : function() {
-						return [{
-							"id": 0,
-							"authors": [{
-								"id": 0,
-								"name": "F. Scott Fitzgerald"
-							}],
-							"category": {
-								"id": 2,
-								"name": "Rich people",
-								"parentId": 1,
-								"hasChildren": false
-							},
-							"title": "The Great Gatsby",
-							"publishDate": -16142
-						}];
-					}
-				},
-				authors : {
-					query : function() {
-						return [{
-							"id": 0,
-							"name": "F. Scott Fitzgerald"
-						}];
-					}
-				},
-				categories : {
-					query : function() {
-						return [{
-							"id" : 1,
-							"name" : "Root category",
-							"hasChildren" : true
-						}];
-					}
-				},
-				category : {
-					query : function(id, success) {
-						success([{
-							"name" : "Category with children",
-							"hasChildren" : true
-						}, {
-							"name" : "Category with no children",
-							"hasChildren" : false
-						}]);
-					}
-				}
-			}
-		} else {
-			return {
-				books : $resource("rest/books"),
-				authors : $resource("rest/authors"),
-				categories : $resource("rest/categories"),
-				category : $resource("rest/categories/:id"),
-			}			
-		}
+		return {
+			books : $resource("rest/books"),
+			authors : $resource("rest/authors"),
+			categories : $resource("rest/categories"),
+			category : $resource("rest/categories/:id"),
+		};
 	});
 
 })();
