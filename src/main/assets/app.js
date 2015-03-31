@@ -1,6 +1,6 @@
 (function() {
 
-	var mockBackend = true;
+	var mockBackend = false;
 
 	var slick = angular.module("slick", ["ngRoute", "ngResource", "ngMaterial"]);
 
@@ -20,6 +20,15 @@
 				}
 			}
 		});
+		$routeProvider.when("/books/add", {
+			templateUrl : "partial/editBook.html",
+			controller : "AddBookCtrl as ctrl",
+			resolve : {
+				authors : function(backend) {
+					return backend.authors.query();
+				}
+			}
+		});
 		$routeProvider.when("/authors", {
 			templateUrl : "partial/authors.html",
 			controller : "AuthorsCtrl as ctrl",
@@ -29,6 +38,10 @@
 				}
 			}
 		});
+		$routeProvider.when("/authors/add", {
+			templateUrl : "partial/editAuthor.html",
+			controller : "AddAuthorCtrl as ctrl"
+		});
 		$routeProvider.when("/categories", {
 			templateUrl : "partial/categories.html",
 			controller : "CategoriesCtrl as ctrl",
@@ -37,6 +50,10 @@
 					return backend.categories.query();
 				}
 			}
+		});
+		$routeProvider.when("/categories/add", {
+			templateUrl : "partial/editCategory.html",
+			controller : "AddCategoryCtrl as ctrl"
 		});
 		$routeProvider.otherwise("/books");
 	});
@@ -73,17 +90,65 @@
 		});
 	});
 
-	slick.controller("BooksCtrl", function(items) {
-		this.items = items;
+	slick.service("notify", function($mdToast) {
+		return function(message) {
+			var toast = $mdToast.simple().content(message).action("OK");
+			$mdToast.show(toast);
+		};
 	});
 
-	slick.controller("AuthorsCtrl", function(items) {
+	slick.controller("BooksCtrl", function(items, $location) {
 		this.items = items;
+		this.add = function() {
+			$location.path("/books/add");
+		};
 	});
 
-	slick.controller("CategoriesCtrl", function(items, backend) {
+	slick.controller("AddBookCtrl", function(authors, backend, notify, $location) {
+		this.authors = authors;
+		var book = {
+			authors : []
+		};
+		this.book = book;
+		this.addAuthor = function() {
+			book.authors.push(this.author);
+			this.authors = this.authors.filter(function(other) {
+				return other.id !== this.author.id;
+			}, this);
+			delete this.author;
+		};
+		this.save = function() {
+			backend.books.save(book, function() {
+				notify("Saved");
+				$location.path("/books")
+			}, function() {
+				notify("Server error");
+			});
+		};
+	});
+
+	slick.controller("AuthorsCtrl", function(items, $location) {
 		this.items = items;
-		
+		this.add = function() {
+			$location.path("/authors/add");
+		};
+	});
+
+	slick.controller("AddAuthorCtrl", function(backend, notify, $location) {
+		var author = {};
+		this.author = author;
+		this.save = function() {
+			backend.authors.save(author, function() {
+				notify("Saved");
+				$location.path("/authors")
+			}, function() {
+				notify("Server error");
+			});
+		};
+	});
+
+	slick.controller("CategoriesCtrl", function(items, backend, $location) {
+		this.items = items;		
 		this.icon = function(item) {
 			if(item.hasChildren && !item.expanded) {
 				return "fi-pricetag-multiple";
@@ -91,7 +156,6 @@
 				return "fi-price-tag";
 			}
 		};
-
 		this.toggle = function(item) {
 			if(item.hasChildren) {
 				item.expanded = !item.expanded;
@@ -103,6 +167,24 @@
 					});
 				}				
 			}
+		};
+		this.add = function() {
+			$location.path("/categories/add");
+		};
+	});
+
+	slick.controller("AddCategoryCtrl", function(backend, notify, $location) {
+		var category = {
+			hasChildren : false
+		};
+		this.category = category;
+		this.save = function() {
+			backend.categories.save(category, function() {
+				notify("Saved");
+				$location.path("/categories");
+			}, function() {
+				notify("Server error");
+			});
 		};
 	});
 

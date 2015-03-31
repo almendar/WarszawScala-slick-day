@@ -1,0 +1,23 @@
+<form name="ctrl.form">
+	<div layout="column">
+		<md-input-container>
+			<label>Title:</label>
+			<input type="text" ng-model="ctrl.book.title" required>
+		</md-input-container>
+		<div layout="column">
+			<label>Authors:</label>
+			<div ng-show="ctrl.book.authors.length == 0"><i>none</i></div>
+			<div ng-repeat="author in ctrl.book.authors">{{author.name}}</div>
+			<div layout="row" ng-show="ctrl.authors.length > 0">
+				<md-select layout-fill ng-model="ctrl.author">
+					<md-option ng-value="author" ng-repeat="author in ctrl.authors">{{author.name}}</md-option>
+				</md-select>
+				<md-button class="md-raised" ng-click="ctrl.addAuthor()">Add author</md-button>
+			</div>
+		</div>
+		</md-select>
+		<div layout="row" layout-align="end center">
+			 <md-button class="md-raised md-primary" ng-click="ctrl.save()">Save</md-button>
+		</div>
+	</div>
+</form>
