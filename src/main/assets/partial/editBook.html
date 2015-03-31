@@ -8,6 +8,15 @@
 			</div>				
 		</md-input-container>
 
+		<md-input-container>
+			<label>Publish date</label>
+			<input type="date" ng-model="ctrl.publishDate" name="publishDate" required>
+			<div class="errors" ng-messages="form.publishDate.$error">
+				<div ng-message="required">Required</div>
+				<div ng-message="parse">Bad format</div>
+			</div>				
+		</md-input-container>
+
 		<span class="md-subhead">Authors</span>
 		<md-whiteframe class="md-whiteframe-z1" layout-padding layout="column">
 			<div layout-fill layout="row" layout-align="space-between center" ng-repeat="author in ctrl.selectedAuthors(true)">

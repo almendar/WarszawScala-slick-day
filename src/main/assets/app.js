@@ -132,7 +132,7 @@
 				});
 			});
 			book.category = angular.copy(this.category);
-			book.publishDate = 0;
+			book.publishDate = moment(this.publishDate).unix() / (24 * 60 * 60);
 			delete book.category.path;
 			backend.books.save(book, function() {
 				notify("Saved");
