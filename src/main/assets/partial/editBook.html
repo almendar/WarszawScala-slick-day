@@ -17,6 +17,14 @@
 				<md-button style="margin-left: 8px;" class="md-raised" ng-disabled="!ctrl.author" ng-click="ctrl.addAuthor()">Add</md-button>
 			</div>
 		</md-whiteframe>
+
+		<span class="md-subhead">Category</span>
+		<md-whiteframe class="md-whiteframe-z1 md-input-container" ng-class="{'md-input-invalid' : form.category.$invalid}" layout-padding layout="column">
+			<md-select layout-fill ng-model="ctrl.category" name="category" placeholder="Choose" required>
+				<md-option ng-value="category" ng-repeat="category in ctrl.categories">{{category.path}}</md-option>
+			</md-select>
+		</md-whiteframe>
+
 		<div layout="row" flex layout-align="end center" style="margin-top: 8px;">
 			 <md-button class="md-raised md-primary" ng-click="ctrl.save()">Save</md-button>
 		</div>

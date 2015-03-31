@@ -24,6 +24,9 @@
 			resolve : {
 				authors : function(backend) {
 					return backend.authors.query();
+				},
+				categories : function(categoryTree) {
+					return categoryTree();
 				}
 			}
 		});
@@ -102,8 +105,9 @@
 		};
 	});
 
-	slick.controller("AddBookCtrl", function(authors, backend, notify, $location) {
+	slick.controller("AddBookCtrl", function(authors, categories, backend, notify, $location) {
 		this.authors = authors;
+		this.categories = categories;
 		var book = {
 			authors : []
 		};
@@ -127,6 +131,9 @@
 					name : item.name
 				});
 			});
+			book.category = angular.copy(this.category);
+			book.publishDate = 0;
+			delete book.category.path;
 			backend.books.save(book, function() {
 				notify("Saved");
 				$location.path("/books")
@@ -203,6 +210,63 @@
 			authors : $resource("rest/authors"),
 			categories : $resource("rest/categories"),
 			category : $resource("rest/categories/:id"),
+		};
+	});
+
+	slick.service("categoryTree", function($q, backend) {
+		function fetchTree(parent) {
+			if(parent.hasChildren) {
+				return backend.category.query({ 
+					id : parent.id 
+				}).$promise.then(function (children) {
+					return $q.all(children.map(fetchTree)).then(function (results) {
+						results.unshift(parent);
+						return results;
+					});
+				});				
+			} else {
+				return $q(function (resolve) {
+					resolve(parent);
+				});
+			}
+		}
+		function flatten(array) {
+			var out = [];
+			array.forEach(function (elem) {
+				if(elem.length && typeof elem !== "string") {
+					Array.prototype.push.apply(out, flatten(elem));
+				} else {
+					out.push(elem);
+				}
+			});
+			return out;
+		}
+		function addPaths(categories) {
+			var byId = {};
+			categories.forEach(function (category) {
+				byId[category.id] = category;
+			});
+			function path(category) {
+				if(!category.path) {
+					if(typeof category.parentId !== "undefined") {
+						category.path = path(byId[category.parentId]) + " / " + category.name;
+					} else {
+						category.path = category.name;
+					}
+				}
+				return category.path;
+			}
+			categories.forEach(path);
+			return categories.sort(function (c1, c2) {
+				return c1.path > c2.path;
+			});
+		}
+		return function() {
+			return backend.categories.query().$promise.then(function (rootCategories) {
+				return $q.all(rootCategories.map(fetchTree));
+ 			}).then(function (categories) {
+ 				return addPaths(flatten(categories));
+			});
 		};
 	});
 
