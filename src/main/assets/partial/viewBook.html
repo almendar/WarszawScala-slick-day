@@ -1,18 +1,24 @@
 <div layout="column">
-  <div>Title</div>
-  <div>{{ctrl.book.title}}</div>
+	<div layout="column">
+		<div>Title</div>
+		<div>{{ctrl.book.title}}</div>
 
-  <div class="md-body-2">Publish date</div>
-  <div>{{ctrl.book.publishDate | epochDaysDate}}</div>
+		<div class="md-body-2">Publish date</div>
+		<div>{{ctrl.book.publishDate | epochDaysDate}}</div>
 
-  <ng-switch on="ctrl.book.authors.length">
-  	<div class="md-body-2" ng-switch-when="1">Author</div>
-  	<div class="md-body-2" ng-switch-default>Authors</div>
-  </ng-switch>  
-  <div>
-  	<span ng-repeat-start="author in ctrl.book.authors">{{author.name}}</span><span ng-repeat-end ng-if="!$last">, </span>
-  </div>
+		<ng-switch on="ctrl.book.authors.length">
+			<div class="md-body-2" ng-switch-when="1">Author</div>
+			<div class="md-body-2" ng-switch-default>Authors</div>
+		</ng-switch>	
+		<div>
+			<span ng-repeat-start="author in ctrl.book.authors">{{author.name}}</span><span ng-repeat-end ng-if="!$last">, </span>
+		</div>
 
-  <div class="md-body-2">Category</div>
-  <div>{{ctrl.book.category.name}}</div>
+		<div class="md-body-2">Category</div>
+		<div>{{ctrl.book.category.name}}</div>
+	</div>
+
+	<div layout="row" flex layout-align="end center" style="margin-top: 8px;">
+		<md-button class="md-raised md-warn" ng-click="ctrl.remove()">Delete</md-button>
+	</div>
 </div>

@@ -161,8 +161,18 @@
 		};
 	});
 
-	slick.controller("ViewBookCtrl", function (book) {
+	slick.controller("ViewBookCtrl", function (book, backend, notify, $location) {
 		this.book = book;
+		this.remove = function () {
+			backend.book.delete({
+				id : book.id
+			}, function () {
+				notify("Deleted");
+				$location.path("/books");
+			}, function () {
+				notify("Server error");
+			});
+		};
 	});
 
 	slick.filter("epochDaysDate", function () {
