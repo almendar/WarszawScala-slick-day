@@ -1,21 +1,29 @@
 <div layout="column">
-	<div layout="column">
-		<div>Title</div>
-		<div>{{ctrl.book.title}}</div>
-
-		<div class="md-body-2">Publish date</div>
-		<div>{{ctrl.book.publishDate | epochDaysDate}}</div>
-
-		<ng-switch on="ctrl.book.authors.length">
-			<div class="md-body-2" ng-switch-when="1">Author</div>
-			<div class="md-body-2" ng-switch-default>Authors</div>
-		</ng-switch>	
-		<div>
-			<span ng-repeat-start="author in ctrl.book.authors">{{author.name}}</span><span ng-repeat-end ng-if="!$last">, </span>
+	<div layout="column" layout-padding>
+		<div flex layout="column">
+			<small>Title</small>
+			<div>{{ctrl.book.title}}</div>
 		</div>
 
-		<div class="md-body-2">Category</div>
-		<div>{{ctrl.book.category.name}}</div>
+		<div flex layout="column">
+			<small>Publish date</small>
+			<div>{{ctrl.book.publishDate | epochDaysDate}}</div>
+		</div>
+
+		<div flex layout="column">
+			<ng-switch on="ctrl.book.authors.length">
+				<small ng-switch-when="1">Author</small>
+				<small ng-switch-default>Authors</small>
+			</ng-switch>	
+			<div>
+				<span ng-repeat-start="author in ctrl.book.authors">{{author.name}}</span><span ng-repeat-end ng-if="!$last">, </span>
+			</div>
+		</div>
+
+		<div flex layout="column">
+			<small>Category</small>
+			<div>{{ctrl.book.category.name}}</div>
+		</div>
 	</div>
 
 	<div layout="row" flex layout-align="end center" style="margin-top: 8px;">
