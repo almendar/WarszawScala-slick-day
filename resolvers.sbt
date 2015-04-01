@@ -2,4 +2,4 @@ resolvers += "spray repo" at "http://repo.spray.io"
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
-resolvers += "Typesafe Releases Repository" at "https://repo.typesafe.com/typesafe/releases/"
+resolvers += Resolver.typesafeRepo("releases")
