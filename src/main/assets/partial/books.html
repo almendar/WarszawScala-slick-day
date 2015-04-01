@@ -2,7 +2,7 @@
 	<md-list class="main" layout="column" layout-align="start start" layout-fill>
 		<md-item ng-repeat="item in ctrl.items" layout-fill>
 			<md-item-content>
-				<md-button layout-fill ng-click="ctrl.selected(item)">
+				<md-button layout-fill ng-click="ctrl.view(item)">
 					<div layout="row" layout-align="start start">
 						<div>
 							<md-icon md-font-icon="fi-book" alt="{{item.title}}"/>

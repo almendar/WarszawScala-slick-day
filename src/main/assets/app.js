@@ -29,6 +29,17 @@
 				}
 			}
 		});
+		$routeProvider.when("/books/view/:id", {
+			templateUrl : "partial/viewBook.html",
+			controller : "ViewBookCtrl as ctrl",
+			resolve : {
+				book : function (backend, $route) {
+					return backend.book.get({
+						id : $route.current.params.id
+					});
+				}
+			}
+		});
 		$routeProvider.when("/authors", {
 			templateUrl : "partial/authors.html",
 			controller : "AuthorsCtrl as ctrl",
@@ -107,6 +118,9 @@
 		this.add = function () {
 			$location.path("/books/add");
 		};
+		this.view = function(book) {
+			$location.path("/books/view/" + book.id);
+		};
 	});
 
 	slick.controller("AddBookCtrl", function (authors, categories, backend, notify, $location) {
@@ -144,6 +158,16 @@
 			}, function () {
 				notify("Server error");
 			});
+		};
+	});
+
+	slick.controller("ViewBookCtrl", function (book) {
+		this.book = book;
+	});
+
+	slick.filter("epochDaysDate", function () {
+		return function (input) {
+			return moment.unix(input * 24 * 60 * 60).format('YYYY-MM-DD');
 		};
 	});
 
@@ -215,6 +239,7 @@
 	slick.service("backend", function ($resource, $q) {
 		return {
 			books : $resource("rest/books"),
+			book : $resource("rest/books/:id"),
 			authors : $resource("rest/authors"),
 			categories : $resource("rest/categories"),
 			category : $resource("rest/categories/:id"),
