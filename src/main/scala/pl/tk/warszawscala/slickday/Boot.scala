@@ -12,11 +12,11 @@ object Boot extends App {
   val interface = config.getString("app.interface")
   val port = config.getInt("app.port")
   val runWithMock = config.getBoolean("app.runWithMock")
-  implicit val system = ActorSystem("notes-system")
+  implicit val system = ActorSystem("books-system")
   val service =
     if(runWithMock)
-      system.actorOf(Props[MockLibraryService],"notes-service")
+      system.actorOf(Props[MockLibraryService],"books-service")
     else
-      system.actorOf(Props[LibraryService], "notes-service")
+      system.actorOf(Props[LibraryService], "books-service")
   IO(Http) ! Http.Bind(service, interface, port = port)
 }
