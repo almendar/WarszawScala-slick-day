@@ -4,6 +4,18 @@
 			<label>Name</label>
 			<input type="text" ng-model="ctrl.category.name" required>
 		</md-input-container>
+
+		<span class="md-subhead">Parent category</span>
+		<md-whiteframe class="md-whiteframe-z1 md-input-container" ng-class="{'md-input-invalid' : form.parentCategory.$invalid}" layout-padding layout="column">
+			<md-select layout-fill ng-model="ctrl.parentCategory" name="parentCategory" placeholder="Choose" required>
+				<md-option ng-value=""><i>None</i></md-option>
+				<md-option ng-value="category" ng-repeat="category in ctrl.categories">{{category.path}}</md-option>
+			</md-select>
+			<div class="errors" ng-messages="form.category.$error">
+				<div ng-message="required">Required</div>
+			</div>		
+		</md-whiteframe>
+		
 		<div layout="row" layout-align="end center">
 			 <md-button class="md-raised md-primary" ng-click="ctrl.save()">Save</md-button>
 		</div>

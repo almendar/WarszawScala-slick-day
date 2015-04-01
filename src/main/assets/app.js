@@ -53,7 +53,12 @@
 		});
 		$routeProvider.when("/categories/add", {
 			templateUrl : "partial/editCategory.html",
-			controller : "AddCategoryCtrl as ctrl"
+			controller : "AddCategoryCtrl as ctrl",
+			resolve : {
+				categories : function (categoryTree) {
+					return categoryTree();
+				}
+			}
 		});
 		$routeProvider.otherwise("/books");
 	});
@@ -188,12 +193,16 @@
 		};
 	});
 
-	slick.controller("AddCategoryCtrl", function (backend, notify, $location) {
+	slick.controller("AddCategoryCtrl", function (categories, backend, notify, $location) {
+		this.categories = categories;
 		var category = {
 			hasChildren : false
 		};
 		this.category = category;
 		this.save = function () {
+			if(this.parentCategory) {
+				category.parentId = this.parentCategory.id;
+			}
 			backend.categories.save(category, function () {
 				notify("Saved");
 				$location.path("/categories");
